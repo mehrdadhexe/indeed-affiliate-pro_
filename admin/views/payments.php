@@ -118,10 +118,16 @@
 													<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>">PayPal</span>
 													<?php
 													break;
+                                                case 'wallet':
+													$payment_class = ($inside_array['is_active']) ? 'uap_affiliate_wallet_type' : '';
+													?>
+													<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>"><?php _e('Wallet', 'uap');?></span>
+													<?php
+													break;
 												case 'bt':
 													$payment_class = ($inside_array['is_active']) ? 'uap-payment-type-active-bt' : '';
 													?>
-													<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>"><?php _e('Bank Transfer', 'uap');?></span>											
+													<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>"><?php _e('Bank Transfer', 'uap');?></span>
 													<?php
 													break;
 												case 'stripe':

@@ -633,6 +633,7 @@ if (!class_exists('Uap_Db')){
 									'reccuring_referrals',
 									'social_share',
 									'paypal',
+                                    'wallet',
 									'stripe',
 									'bonus_on_rank',
 									'pay_per_click',
@@ -4302,6 +4303,61 @@ if (!class_exists('Uap_Db')){
 			}
 		}
 
+        	public function add_payment_wallet($data=array()){
+			/*
+			 * @param array
+			 * @return none
+			 */
+			if ($data){
+				global $wpdb;
+
+				///get current payment details and store in into db
+				$data['payment_details'] = $this->get_current_payment_settings_for_affiliate_id($data['affiliate_id']);
+
+				$table = $wpdb->prefix . 'uap_payments';
+				$q = $wpdb->prepare("INSERT INTO $table VALUES( null,
+														 %s,
+														 %s,
+														 %s,
+														 %s,
+														 %s,
+														 %s,
+														 %s,
+														 %s,
+														 %s,
+														 '',
+														 %s
+				);", $data['payment_type'], $data['transaction_id'], $data['referral_ids'],
+				$data['affiliate_id'], $data['amount'], $data['currency'], $data['payment_details'],
+				$data['create_date'], $data['update_date'], $data['status']
+				);
+				$wpdb->query($q);
+                $uid_ref=$this->get_uid_by_affiliate_id($data['affiliate_id']);
+                if (class_exists('WooWallet'))
+              {
+
+
+                   $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
+                   //if ($tr_type=='wallet')
+                  // {
+                       woo_wallet()->wallet->credit($uid_ref,$data['amount'],'Checking By Admin');
+                  // }
+
+                   //else
+                   // {
+                   //   woo_wallet()->wallet->debit($uid_ref,$data['amount'],'Checking By Admin');
+                   // }
+
+
+
+              }
+				/// NOTIFICATION TO AFFILIATE
+				$id = $wpdb->insert_id;
+				$this->payments_send_affiliate_notification_by_status($id, $data['status']);
+			}
+		}
+
+
 		public function add_payment($data=array()){
 			/*
 			 * @param array
@@ -4331,7 +4387,25 @@ if (!class_exists('Uap_Db')){
 				$data['create_date'], $data['update_date'], $data['status']
 				);
 				$wpdb->query($q);
+                $uid_ref=$this->get_uid_by_affiliate_id($data['affiliate_id']);
+                if (class_exists('WooWallet'))
+              {
 
+
+                   $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
+                   if ($tr_type=='wallet')
+                   {
+                       woo_wallet()->wallet->credit($uid_ref,$data['amount'],'Checking By Admin');
+                   }
+
+                   else
+                    {
+                      woo_wallet()->wallet->debit($uid_ref,$data['amount'],'Checking By Admin');
+                    }
+
+
+
+              }
 				/// NOTIFICATION TO AFFILIATE
 				$id = $wpdb->insert_id;
 				$this->payments_send_affiliate_notification_by_status($id, $data['status']);
@@ -4564,6 +4638,11 @@ if (!class_exists('Uap_Db')){
 			 * @param int, int (0,1,2)
 			 * @return none
 			 */
+
+
+
+
+
 			if ($id){
 				global $wpdb;
 				/// update payments
@@ -4646,6 +4725,7 @@ if (!class_exists('Uap_Db')){
 				$table = $wpdb->prefix . 'uap_payments';
 				$q = $wpdb->prepare("SELECT referral_ids FROM $table WHERE id=%d ", $transaction_id);
 				$data = $wpdb->get_row($q);
+                $amount= $data->amount;
 				if (!empty($data->referral_ids)){
 					$ids = explode(',', $data->referral_ids);
 					if ($ids){
@@ -4653,6 +4733,23 @@ if (!class_exists('Uap_Db')){
 						foreach ($ids as $id){
 								$q = $wpdb->prepare("UPDATE $table SET payment='0' WHERE id=%d ", $id);
 								$wpdb->query($q);
+                               /* $uid_ref=$this->get_uid_by_affiliate_id($id);
+                                 if (class_exists('WooWallet'))
+                                  {
+
+
+                                  $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
+                                   if ($tr_type=='wallet')
+                                      woo_wallet()->wallet->credit($uid_ref,$amount,'Checking By Admin');
+                                    else
+                                    {
+                                      woo_wallet()->wallet->debit($uid_ref,$amount,'Checking By Admin');
+                                    }
+                                 }
+*/
+
+
+
 						}
 						$table = $wpdb->prefix . 'uap_payments';
 						$q = $wpdb->prepare("DELETE FROM $table WHERE id=%d ", $transaction_id);
@@ -5598,7 +5695,49 @@ if (!class_exists('Uap_Db')){
 			}
 			return '';
 		}
+        	public function update_wallet_transactions(){
+			/*
+			 * @param none
+			 * @return none
+			 */
+			global $wpdb;
+			$table = $wpdb->base_prefix . 'uap_payments';
+			$data = $wpdb->get_results("SELECT transaction_id, id FROM $table
+											WHERE 1=1
+											AND payment_type='wallet'
+											AND status=1
+											ORDER BY update_date DESC
+			");
+			if (!empty($data)){
+				require_once UAP_PATH . 'classes/Uap_PayPal.class.php';
+				foreach ($data as $object){
+					$paypal = new Uap_PayPal();
+					$status = $paypal->get_status($object->transaction_id);
+					$this->update_transaction_payment_special_status($object->id, $status);
+					switch ($status){
+						case 'SUCCESS':
+							$this->change_transaction_status($object->id, 2);
+							break;
+						case 'DENIED':
+						case 'FAILED':
+						case 'UNCLAIMED':
+						case 'RETURNED':
+						case 'ONHOLD':
+						case 'BLOCKED':
+						case 'CANCELLED':
+							$this->change_transaction_status($object->id, 0);
+							break;
+						case 'PENDING':
+						case 'PROCESSIN':
+						default:
+							$this->change_transaction_status($object->id, 1);
+							break;
+					}
 
+				}
+				unset($paypal);
+			}
+		}
 		public function update_paypal_transactions(){
 			/*
 			 * @param none
@@ -5862,6 +6001,7 @@ if (!class_exists('Uap_Db')){
 			 */
 			$array = array(
 							'uap_affiliate_payment_type' => 'bt',
+                            'uap_affiliate_wallet_type' => '',
 							///BT
 							'uap_affiliate_bank_transfer_data' => '',
 							/// PAYPAL
@@ -5951,6 +6091,11 @@ if (!class_exists('Uap_Db')){
 						$data['is_active'] = (empty($temp['uap_affiliate_paypal_email'])) ? FALSE : TRUE;
 						$data['settings'] = $temp['uap_affiliate_paypal_email'];
 						break;
+
+                   case 'wallet':
+					  $data['is_active'] = (empty($temp['uap_affiliate_wallet_type'])) ? FALSE : TRUE;
+					  $data['settings'] = $temp['uap_affiliate_wallet_type'];
+					  break;
 					case 'bt':
 						$data['is_active'] = (empty($temp['uap_affiliate_bank_transfer_data'])) ? FALSE : TRUE;
 						$data['settings'] = $temp['uap_affiliate_bank_transfer_data'];
@@ -6124,6 +6269,7 @@ if (!class_exists('Uap_Db')){
 			 $payments = array(
 								'bt' => __('Bank Transfer', 'uap'),
 								'paypal' => __('PayPal', 'uap'),
+                                'wallet' => __('Wallet', 'uap'),
 								'stripe' => __('Stripe', 'uap'),
 								'stripe_v2' => __('Stripe Managed Accounts', 'uap'),
 			 );
@@ -6132,6 +6278,9 @@ if (!class_exists('Uap_Db')){
 			 }
 			 if (!$this->is_magic_feat_enable('stripe') || (defined('UAP_LICENSE_SET') && !UAP_LICENSE_SET)){
 			 	unset($payments['stripe']);
+			 }
+             if (!$this->is_magic_feat_enable('wallet') || (defined('UAP_LICENSE_SET') && !UAP_LICENSE_SET)){
+			 	unset($payments['wallet']);
 			 }
 			 if (!$this->is_magic_feat_enable('stripe_v2') || (defined('UAP_LICENSE_SET') && !UAP_LICENSE_SET)){
 			 	unset($payments['stripe_v2']);

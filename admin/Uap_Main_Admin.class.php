@@ -321,7 +321,7 @@ if (!class_exists('Uap_Main_Admin')){
 			 * @param none
 			 * @return none
 			 */
-			add_menu_page('Ultimate Affiliate Pro', '<span>Ultimate Affiliate Pro</span>', 'manage_options',	'ultimate_affiliates_pro', array($this, 'output') , 'dashicons-networking');
+			add_menu_page('افیلیت اختصاصی نمکدون', '<span>افیلیت اختصاصی نمکدون</span>', 'manage_options',	'ultimate_affiliates_pro', array($this, 'output') , 'dashicons-networking');
 		}
 
 		public function output(){
@@ -1226,6 +1226,10 @@ if (!class_exists('Uap_Main_Admin')){
 				case 'transactions':
 					/// ACTIONS
 					if (!empty($_POST['do_payment'])){
+
+
+
+
 						if (empty($_POST['affiliates'])){
 							$errors = $this->do_single_payment($_POST);
 							if (!empty($errors['error_users'])){
@@ -1398,6 +1402,7 @@ if (!class_exists('Uap_Main_Admin')){
 					$data['return_url'] = admin_url('admin.php?page=ultimate_affiliates_pro&tab=payments');
 					$data['paypal'] = $indeed_db->is_magic_feat_enable('paypal');
 					$data['stripe'] = $indeed_db->is_magic_feat_enable('stripe');
+                    $data['wallet'] = $indeed_db->is_magic_feat_enable('wallet');
 					$data['stripe_v2'] = $indeed_db->is_magic_feat_enable('stripe_v2');
 					require_once $this->admin_view_path . 'payment-form.php';
 					break;
@@ -1440,6 +1445,28 @@ if (!class_exists('Uap_Main_Admin')){
 					$indeed_db->add_payment($data);
 					return TRUE;
 					break;
+               /* case 'wallet':
+
+                   update_option("testnm", "wallet", $autoload );
+
+                 // woo_wallet()->wallet->credit($uid_ref,$data['amount'],'Checking By Admin');
+					/// wallet
+				  	$indeed_db->change_referrals_status($ids, $post_data['payment_status']);/// set referral payment as complete
+					$data = array(
+									'payment_type' => 'wallet',
+									'transaction_id' => '-',
+									'referral_ids' => $post_data["referrals_in"],
+									'affiliate_id' => $post_data['affiliate_id'],
+									'amount' => $post_data['amount'],
+									'currency' => $post_data['currency'],
+									'create_date' => date('Y-m-d H:i:s', time()),
+									'update_date' => date('Y-m-d H:i:s', time()),
+									'status' => $post_data['payment_status'],
+					);
+					$indeed_db->add_payment($data);
+					return TRUE;
+					break;*/
+
 				case 'paypal':
 					/// paypal
 					require_once UAP_PATH . 'classes/Uap_PayPal.class.php';
@@ -1546,6 +1573,31 @@ if (!class_exists('Uap_Main_Admin')){
 						return TRUE;
 					}
 					break;
+
+                	case 'wallet':
+					/// bank transfer
+					$affiliates_arr = (empty($post_data['affiliates'])) ? '' : explode(',', $post_data['affiliates']);
+					if ($affiliates_arr){
+						foreach ($affiliates_arr as $affiliate_id){
+							$ids = (empty($post_data["referrals"][$affiliate_id])) ? array() : explode(',', $post_data["referrals"][$affiliate_id]);
+							$indeed_db->change_referrals_status($ids, $post_data['payment_status']);/// set referral payment status as complete
+							$data = array(
+									'payment_type' => 'wallet',
+									'transaction_id' => '-',
+									'referral_ids' => $post_data["referrals"][$affiliate_id],
+									'affiliate_id' => $affiliate_id,
+									'amount' => $post_data["amount"][$affiliate_id],
+									'currency' => $post_data['currency'][$affiliate_id],
+									'create_date' => date('Y-m-d H:i:s', time()),
+									'update_date' => date('Y-m-d H:i:s', time()),
+									'status' => $post_data['payment_status'],
+							);
+							$indeed_db->add_payment($data);
+						}
+						return TRUE;
+					}
+					break;
+
 				case 'paypal':
 					/// paypal
 					$return = array();

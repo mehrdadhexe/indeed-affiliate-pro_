@@ -437,11 +437,26 @@ function uap_approve_affiliate(i){
 }
 
 function uap_payment_form_payment_status(v){
+
+    jQuery('#do_payment_wallet').val(v);
 	if (v=='bank_transfer'){
 		jQuery('#payment_status_div').css('display', 'block');
 	} else {
 		jQuery('#payment_status_div').css('display', 'none');
 	}
+
+    if(v=='wallet') {
+    	jQuery('#payment_status_div_wallet').css('display', 'block');
+
+
+	} else {
+		jQuery('#payment_status_div_wallet').css('display', 'none');
+	}
+
+
+
+
+
 }
 
 function uap_do_delete(t, f){

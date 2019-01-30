@@ -261,7 +261,7 @@ if (!class_exists('Affiliate_Account_Page')){
 			$payment_settings = $indeed_db->get_affiliate_payment_type($this->uid);
 
 			if (empty($payment_settings['is_active']) && empty($this->public_extra_settings['uap_hide_payments_warnings'])){
-				$data['warning_messages'][] = __('Payment Service Settings are not set properly', 'uap');
+			   //	$data['warning_messages'][] = __('Payment Service Settings are not set properly', 'uap');
 			}
 
 			$fullPath = UAP_PATH . 'public/views/account_page-top_messages.php';

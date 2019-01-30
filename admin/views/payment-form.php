@@ -5,6 +5,7 @@
 		<div class="row">
 				<?php
 					$checked_paypal = '';
+                    $checked_wallet = '';
 					$checked_bt = '';
 					$checked_stripe = '';
 					$checked_stripe_v2 = '';
@@ -13,6 +14,9 @@
 						switch ($data['affiliate_pay']['payment_gateway_data']['type']){
 							case 'paypal':
 								$checked_paypal = 'checked';
+								break;
+                            case 'wallet':
+								$checked_wallet = 'checked';
 								break;
 							case 'stripe':
 								$checked_stripe = 'checked';
@@ -38,6 +42,10 @@
 							<input style="vertical-align: bottom;" type="radio" value="paypal" name="paywith" onClick="uap_payment_form_payment_status(this.value);" <?php echo $checked_paypal;?> /> <?php _e('PayPal', 'uap');?>
 						</div>
 						<?php endif;?>
+                        <div style="margin: 0px 0 10px 0;"  class="uap-list-affiliates-name-label">
+							<input style="vertical-align: bottom;" type="radio" value="wallet" name="paywith" onClick="uap_payment_form_payment_status(this.value);" <?php echo $checked_wallet;?> /> <?php _e('Wallet', 'uap');?>
+						</div>
+
 						<div style="margin: 0px 0 10px 0;"  class="uap-list-affiliates-name-label">
 							<input style="vertical-align: bottom;" type="radio" value="bank_transfer" name="paywith" onClick="uap_payment_form_payment_status(this.value);" <?php echo $checked_bt;?> /> <?php _e('Bank Transfer', 'uap');?>
 						</div>
@@ -66,8 +74,36 @@
 							<input style="vertical-align: bottom;" type="radio" value="2" name="payment_status" checked/> <?php _e('Complete', 'uap');?>
 						</div>
 					</div>
+                    <?php $displayw = ($checked_wallet) ? 'block' : 'none';?>
+					<div class="payment-box" id="payment_status_div_wallet" style="display: <?php echo $displayw;?>;">
+					    <h3><?php _e('Payment Status', 'uap');?> </h3>
+					   <!-- <p>
+                           <?php
+                              _e('Amount', 'uap'); echo ":".$data['affiliate_pay']['amount'];
+                           ?>
+
+					    </p>
+
+                        <p>
+                           <?php
+                             _e('Username', 'uap'); echo":".$data['affiliate_pay']['username'];
+                           ?>
+
+                        </p>
+-->
+
+						<p><?php _e('Pay With', 'uap'); echo ":";_e('Wallet', 'uap');?></p>
+                        <input type="hidden" value="<?php echo $data['affiliate_pay']['payment_gateway_data']['type'];?>" name="do_payment_wallet" id="do_payment_wallet" class="button button-primary button-large" />
+
+
+					</div>
+
+
+
+
+
 				</div>				
-			</div>		
+			</div>
 			<div style="margin-top: 10px;">
 				<input type="submit" value="<?php _e('Submit', 'uap');?>" name="do_payment" class="button button-primary button-large" />
 				<button class="button button-primary button-large" onClick="window.location.href='<?php echo $data['return_url'];?>'"><?php _e('Cancel', 'uap');?></button>
@@ -103,11 +139,17 @@
 					<td><?php
 						if (!empty($data['affiliate_pay']['payment_gateway_data']) && !empty($data['affiliate_pay']['payment_gateway_data']['type'])){
 							$temp_key = $data['affiliate_pay']['payment_gateway_data']['type'];
-							switch ($temp_key):											
+							switch ($temp_key):
 								case 'paypal':
 									$payment_class = ($data['affiliate_pay']['payment_gateway_data']['is_active']) ? 'uap-payment-type-active-paypal' : '';
 									?>
 									<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>">PayPal</span>
+									<?php
+									break;
+                                case 'wallet':
+									$payment_class = ($data['affiliate_pay']['payment_gateway_data']['is_active']) ? 'uap_affiliate_wallet_type' : '';
+									?>
+									<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>">wallet</span>
 									<?php
 									break;
 								case 'bt':
@@ -201,10 +243,16 @@
 									<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>">PayPal</span>
 									<?php
 									break;
+                                case 'wallet':
+									$payment_class = ($array['payment_gateway_data']['is_active']) ? 'uap_affiliate_wallet_type' : '';
+									?>
+									<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>"><?php _e('Wallet', 'uap');?></span>
+									<?php
+									break;
 								case 'bt':
 									$payment_class = ($array['payment_gateway_data']['is_active']) ? 'uap-payment-type-active-bt' : '';
 									?>
-									<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>"><?php _e('Bank Transfer', 'uap');?></span>											
+									<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>"><?php _e('Bank Transfer', 'uap');?></span>
 									<?php
 									break;
 								case 'stripe':

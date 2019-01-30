@@ -1051,9 +1051,11 @@
 	padding:30px;
 	padding-top:10px;
 	padding-bottom:0px;
+    margin-left: auto;
+    margin-right: auto;
 	text-align:center;
 	box-sizing:border-box;
-    display: inline-block;
+    display: block;
 	background-color:#fff;
 	border-radius:3px;
 	width:460px;
@@ -2182,6 +2184,13 @@
 }
 /*Register Template 1*/
 .uap-register-1{
+
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+
+
 	
 }
 .uap-register-1 .uap-labels-register{
@@ -2210,7 +2219,7 @@
 }
 
 .uap-register-1 .uap-tos-wrap{
-	text-align:right;
+   /*	text-align:right;   */
 	position:relative;
 }
 .uap-register-1 .uap-submit-form input{

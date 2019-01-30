@@ -42,6 +42,11 @@ class Uap_Woo extends Referral_Main{
 		 * @param int (order id)
 		 * @return none
 		 */
+        global $indeed_db;
+        //if ($_POST['moaref_name'] )
+            // wc_add_notice( __( 'Phone 2 is compulsory. Please enter a value' ), 'error' );
+
+
 		if (empty($order_id)){
 			return; // out
 		}
@@ -53,17 +58,21 @@ class Uap_Woo extends Referral_Main{
 			$this->check_coupon($order);
 		}
 
-		$this->set_affiliate_id();
+
+
+        $this->set_affiliate_id();
 
 		///CHECKOUT REFERRAL SELECT
 		$this->check_for_selected_affiliate();
+		///CHECKOUT REFERRAL SELECT
+        
 		///CHECKOUT REFERRAL SELECT
 
 		if ($this->valid_referral()){
 			// it's valid
 
 			/// tax & shipping settings
-			global $indeed_db;
+
 			$temp_data = $indeed_db->return_settings_from_wp_option('general-settings');
 			$exclude_shipping = (empty($temp_data['uap_exclude_shipping'])) ? FALSE : TRUE;
 			$exclude_tax = (empty($temp_data['uap_exclude_tax'])) ? FALSE : TRUE;
@@ -134,7 +143,16 @@ class Uap_Woo extends Referral_Main{
 							'currency' => self::$currency,
 							'product_price' => $product_price_sum,
 			);
-			$this->save_referral_unverified($args);
+
+
+            $uid_ref=$indeed_db->get_uid_by_affiliate_id(self::$affiliate_id);
+            $this->save_referral_unverified($args);
+             if (class_exists('WooWallet'))
+                  woo_wallet()->wallet->credit($uid_ref,$sum,"Ref  sit");
+
+
+
+
 		}
 	}
 

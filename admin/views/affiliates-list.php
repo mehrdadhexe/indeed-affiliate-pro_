@@ -152,6 +152,15 @@
 												</a>
 												<?php
 												break;
+                                            case 'wallet':
+												$payment_class = ($arr['payment_settings']['is_active']) ? 'uap_affiliate_wallet_type' : '';
+												?>
+												<a href="<?php echo $data['base_view_payment_settings_url'] . $arr['uid'];?> " target="_blank">
+													<span class="uap-admin-aff-payment-type <?php echo $payment_class;?>"><?php _e('Wallet', 'uap');?></span>
+												</a>
+												<?php
+												break;
+
 											case 'bt':
 												$payment_class = ($arr['payment_settings']['is_active']) ? 'uap-payment-type-active-bt' : '';
 												?>

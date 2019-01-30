@@ -5,29 +5,90 @@
 <?php endif;?>
 
 
+         <?php
+
+
+               if (class_exists('WooWallet'))
+              {
+                 /*  $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
+                   if ($tr_type=='wallet')
+                    woo_wallet()->wallet->credit($uid_ref,$comis,"Ref App");*/
+              }
+
+             // add_action('woo_wallet_before_transaction_details_content');
+               //$array = WC_Tracker::get_active_payment_gateways();
+              // echo var_dump($array);
+
+
+
+                     $transactions = get_wallet_transactions();
+
+
+add_action('woo_wallet_before_transaction_details_content');
+
+         ?>
+<table class="uap-account-table">
+    <thead>
+        <tr>
+            <th style="font-size: 20px; text-align: right;"><?php _e('ID', 'woo-wallet'); ?></th>
+            <th style="font-size: 20px; text-align: right;"><?php _e('Credit', 'woo-wallet'); ?></th>
+            <th style="font-size: 20px; text-align: right;"><?php _e('Debit', 'woo-wallet'); ?></th>
+            <!--<th><?php _e('Details', 'woo-wallet'); ?></th>  -->
+            <th style="font-size: 20px; text-align: right;"><?php _e('Date', 'woo-wallet'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($transactions as $key => $transaction) : ?>
+        <tr>
+            <td><?php echo $transaction->transaction_id; ?></td>
+            <td><?php echo $transaction->type == 'credit' ? wc_price(apply_filters('woo_wallet_amount', $transaction->amount, $transaction->currency, $transaction->user_id)) : ' - '; ?></td>
+            <td><?php echo $transaction->type == 'debit' ? wc_price(apply_filters('woo_wallet_amount', $transaction->amount, $transaction->currency, $transaction->user_id)) : ' - '; ?></td>
+           <!-- <td><?php echo $transaction->details; ?></td>   -->
+            <td><?php echo wc_string_to_datetime($transaction->date)->date_i18n(wc_date_format()); ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+
+<!--php add_action('woo_wallet_after_transaction_details_content');-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <div class="uap-row">
 
-	<div class="uapcol-md-2 uap-account-wallet-tab1">
-		<div class="uap-account-no-box uap-account-box-blue">
+
+
+	<div class="uapcol-md-2 uap-account-wallet-tab2">
+		<div class="uap-account-no-box uap-account-box-green">
 			<div class="uap-account-no-box-inside">
-				<div class="uap-count"> <?php echo uap_format_price_and_currency($data['currency'], round(@$data['stats']['wallet'], 2) ); ?> </div>
+				<div class="uap-count"> <?php echo woo_wallet()->wallet->get_wallet_balance(get_current_user_id()); ?></div>
 				<div class="uap-detail"><?php echo __('Wallet available Credit', 'uap'); ?></div>
 			</div>
 		</div>
 	</div>
 
-	<div class="uapcol-md-2 uap-account-wallet-tab2">
-		<div class="uap-account-no-box uap-account-box-green">
-			<div class="uap-account-no-box-inside">
-				<div class="uap-count"> <?php echo uap_format_price_and_currency($data['currency'], round($data['stats']['unpaid_payments_value'], 2));?> </div>
-				<div class="uap-detail"><?php echo __('Available Deposit based on your Earnings', 'uap'); ?></div>
-			</div>
-		</div>
-	</div>
-
 </div>
+
+
+
+
+
+
+<!--
 <?php if ($data['stats']['unpaid_payments_value'] && $data['stats']['unpaid_payments_value']>=$settings['uap_wallet_minimum_amount']):?>
 		<a href="<?php echo $data['add_new'];?>" class="uap-addd-to-wallet"><?php _e('Add New Wallet Credit', 'uap');?></a>
 <?php endif;?>
@@ -54,6 +115,15 @@
 	<?php endforeach;?>
 	</table>
 <?php endif;?>
+
+
+-->
+
+
+
+
+
+
 </div>
 
 <script>

@@ -188,7 +188,7 @@ class UAP_Main{
 		/// PARENT
 		$wp_admin_bar->add_menu(array(
 					'id'    => 'uap_dashboard_menu',
-					'title' => 'Ultimate Affiliate Pro',
+					'title' => 'افیلیت اختصاصی نمکدون',
 					'href'  => '#',
 					'meta'  => array(),
 		));
@@ -329,3 +329,13 @@ class UAP_Main{
 }
 
 UAP_Main::run();
+
+
+
+
+
+
+
+
+
+
