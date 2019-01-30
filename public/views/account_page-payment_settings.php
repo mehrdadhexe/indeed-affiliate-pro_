@@ -1,55 +1,34 @@
 <div class="uap-ap-wrap">
-
 <?php if (!empty($data['title'])):?>
 	<h3><?php echo $data['title'];?></h3>
 <?php endif;?>
 <?php if (!empty($data['message'])):?>
 	<p><?php echo do_shortcode($data['message']);?></p>
-<?php endif;?>
+<?php endif;?>	
 
 <form action="" method="post" class="uap-change-password-form">
 	<div class="uap-ap-field">
 		<label class="uap-ap-label"><?php _e("Payment Type", 'uap');?></label>
-		<select class="uap-public-form-control" onChange="uap_payment_type();" name="uap_affiliate_payment_type"><?php
-		 foreach ($data['payment_types'] as $k=>$v):
+		<select class="uap-public-form-control" onChange="uap_payment_type();" name="uap_affiliate_payment_type"><?php 
+			foreach ($data['payment_types'] as $k=>$v):
 				$selected = ($data['metas']['uap_affiliate_payment_type']==$k) ? 'selected' : '';
 				?>
 				<option value="<?php echo $k;?>" <?php echo $selected;?>><?php echo $v;?></option>
-
 				<?php
-			endforeach;
-                 ?>
-
-
-
-
-		</select>
-	</div>
-
-
-
-    	<!--<div class="uap-ap-field" id="uap_payment_with_wallet" style="display: none;">
-		<label class="uap-ap-label">Wallet</label>
-		<input class="uap-public-form-control" type="text" value="<?php echo $data['metas']['uap_affiliate_wallet_type'];?>" name="uap_affiliate_wallet_type" />
-    	</div>-->
-	<div class="uap-ap-field" id="uap_payment_with_paypal" style="display: <?php
-if($data['metas']["uap_affiliate_payment_type"]=='paypal') echo 'block'; else echo 'none';
-?>;">
-
+			endforeach;	
+		?></select>
+	</div>	
+	<div class="uap-ap-field" id="uap_payment_with_paypal" style="display: none;">
 		<label class="uap-ap-label"><?php _e("PayPal E-mail Address", 'uap');?></label>
 		<input class="uap-public-form-control" type="text" value="<?php echo $data['metas']['uap_affiliate_paypal_email'];?>" name="uap_affiliate_paypal_email" />
 	</div>
 
-	<div class="uap-ap-field" id="uap_payment_with_bt" style="display: <?php
-if($data['metas']["uap_affiliate_payment_type"]=='bt') echo 'block'; else echo 'none';
-?>;">
+	<div class="uap-ap-field" id="uap_payment_with_bt" style="display: none;">
 		<label class="uap-ap-label"><?php _e("Bank Transfer Details", 'uap');?></label>
 		<textarea style="min-height: 100px;" class="uap-public-form-control" name="uap_affiliate_bank_transfer_data"><?php echo $data['metas']['uap_affiliate_bank_transfer_data'];?></textarea>
 	</div>
 	
-	<div class="uap-ap-field" id="uap_payment_with_stripe" style="display: <?php
-if($data['metas']["uap_affiliate_payment_type"]=='stripe') echo 'block'; else echo 'none';
-?>;">
+	<div class="uap-ap-field" id="uap_payment_with_stripe" style="display: none;">
 		<div>
 			<label class="uap-ap-label"><?php _e("Name on Card", 'uap');?></label>
 			<input class="uap-public-form-control" type="text" value="<?php echo $data['metas']['uap_affiliate_stripe_name'];?>" name="uap_affiliate_stripe_name" />			

@@ -320,7 +320,7 @@ function uap_show_subtabs(t){
 }
 
 function uap_payment_type(){
-	jQuery.each(['paypal', 'bt', 'stripe', 'stripe_v2','wallet'], function(k, v){
+	jQuery.each(['paypal', 'bt', 'stripe', 'stripe_v2'], function(k, v){
 		jQuery('#uap_payment_with_' + v).css('display', 'none');
 	});
 	var t = jQuery('[name=uap_affiliate_payment_type]').val();

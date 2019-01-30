@@ -16,7 +16,7 @@
 			</div>
 			<div class="row" style="margin-top: 30px;">
 				<div class="col-xs-8">
-					<p><?php _e('Establish a minimum amount required for an affiliate to be able to move his earnings from his account into his wallet. Only referrals that are verified but not yet paid can be available for converting into coupons in an affiliate’s “Wallet”.', 'uap');?></p>
+					<p><?php _e('Establish a minimum amount required for an affiliate to be able to move his earnings from his account into his wallet. Only referrals that are verified but not yet paid can be available for converting into coupons in an affiliate "Wallet".', 'uap');?></p>
 				</div>
 			</div>
 			<div class="row" style="margin-bottom: 20px;">
@@ -43,6 +43,7 @@
 														'ump' => 'Ultimate Membership Pro',
 														'woo' => 'WooCommerce',
 														'edd' => 'Easy Download Digital',
+														'ulp' => 'Ultimate Learning Pro',
 									);
 									foreach ($types as $key=>$value):?>
 									<div>

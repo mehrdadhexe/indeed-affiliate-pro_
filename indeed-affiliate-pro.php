@@ -3,7 +3,7 @@
 Plugin Name: Indeed Ultimate Affiliate Pro
 Plugin URI: http://www.wpindeed.com/
 Description: The most complete and easy to use Affiliate system Plugin that provides you a complete solution for your affiliates.
-Version: 4.6
+Version: 4.8
 Author: پرشین اسکریپت
 Author URI: http://www.persianscript.ir
 */
@@ -37,6 +37,9 @@ class UAP_Main{
 				define('UAP_PROTOCOL', 'http://');
 			}
 		}
+
+update_option('uap_license_set', 1);
+update_option('uap_envato_code', 'NULLED BY GANJAPARKER');
 
 		if (!defined('UAP_PLUGIN_VER')){
 			define('UAP_PLUGIN_VER', self::get_plugin_ver() );//used for updates
@@ -87,6 +90,12 @@ class UAP_Main{
 		$RewriteDefaultWpAvatar = new \Indeed\Uap\RewriteDefaultWpAvatar();
 		$LoadTemplates = new \Indeed\Uap\LoadTemplates();
 		$uapRestAPI = new \Indeed\Uap\RestAPI();
+		$wpmlActions = new \Indeed\Uap\WPMLActions();
+		$PayToBecomeAffiliate = new \Indeed\Uap\PayToBecomeAffiliate();
+
+		/// elementor
+		$elementorIntegration = new \Indeed\Uap\RegisterElementorWidgets();
+		$gutenbergIntegration = new \Indeed\Uap\GutenbergEditorIntegration();
 
 	}
 
@@ -188,7 +197,7 @@ class UAP_Main{
 		/// PARENT
 		$wp_admin_bar->add_menu(array(
 					'id'    => 'uap_dashboard_menu',
-					'title' => 'افیلیت اختصاصی نمکدون',
+					'title' => 'Ultimate Affiliate Pro',
 					'href'  => '#',
 					'meta'  => array(),
 		));
@@ -329,13 +338,3 @@ class UAP_Main{
 }
 
 UAP_Main::run();
-
-
-
-
-
-
-
-
-
-

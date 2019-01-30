@@ -9,6 +9,7 @@ class CropImage
     );
     private $userMetaName = 'uap_account_page_personal_header';
     private $userId = 0;
+    private $saveUserMeta = true;
 
     public function __construct()
     {
@@ -19,16 +20,14 @@ class CropImage
         require_once ABSPATH . 'wp-admin/includes/media.php';
     }
 
+    public function setSaveUserMeta( $inputValue=true )
+    {
+        $this->saveUserMeta = $inputValue;
+        return $this;
+    }
+
     public function saveImage($filesData=array())
     {
-        if (empty($this->userId)){
-            $this->response = array(
-                        "status"  => 'error',
-                        "message" => 'User is not logged'
-            );
-            return $this;
-        }
-
         $inputName = 'img'; /// ihc_upload_image_top_banner
 
       	$allowedExts = array("gif", "jpeg", "jpg", "png", "GIF", "JPEG", "JPG", "PNG");
@@ -67,19 +66,14 @@ class CropImage
           "url"     => $fileUrl,
           "width"   => $width,
           "height"  => $height,
+          "uploadId"  => $uploadId,
         );
         return $this;
     }
 
     public function cropImage($postData=array())
     {
-        if (empty($this->userId)){
-            $this->response = array(
-                        "status"  => 'error',
-                        "message" => 'User is not logged'
-            );
-            return $this;
-        }
+        global $indeed_db;
         $imgUrl = $postData['imgUrl'];
         // original sizes
         $imgInitW = $postData['imgInitW'];
@@ -116,8 +110,15 @@ class CropImage
                 break;
             case 'image/jpeg':
                 $img_r = imagecreatefromjpeg($imgUrl);
-            		$source_image = imagecreatefromjpeg($imgUrl);
-            		$type = '.jpeg';
+                $source_image = imagecreatefromjpeg($imgUrl);
+                $type = '.jpeg';
+
+                /// check if really is jpeg
+                $pieces = explode('.', $imgUrl);
+                end($pieces);
+                if ( current($pieces)=='jpg' ){
+                    $type = '.jpg';
+                }
                 break;
             case 'image/gif':
                 $img_r = imagecreatefromgif($imgUrl);
@@ -154,10 +155,18 @@ class CropImage
         	imagecopyresampled($final_image, $cropped_rotated_image, 0, 0, $imgX1, $imgY1, $cropW, $cropH, $cropW, $cropH);
         	// finally output png image
         	//imagepng($final_image, $output_filename.$type, $png_quality);
-        	imagejpeg($final_image, $output_filename . $type, $jpeg_quality);
+          $rand = rand(1, 10000);
+          $temporaryFileName = $output_filename . $rand . $type;
+        	imagejpeg( $final_image, $temporaryFileName, 100 );
 
-          $fileUrl = $urlPath . '/' . $fileNameWithoutTypeStr . $type;
-          update_user_meta($this->userId, $this->userMetaName, $fileUrl);
+          $fileUrl = $urlPath . '/' . $fileNameWithoutTypeStr . $rand . $type;
+          $oldFileUrl = $urlPath . '/' . $fileNameWithoutTypeStr . $type;
+          $indeed_db->modifyGuid( $postData['uploadId'], $fileUrl );
+          $indeed_db->updateAttachmentMetadataFileUrl( $postData['uploadId'], $fileUrl);
+
+          if ( $this->saveUserMeta ){
+              update_user_meta($this->userId, $this->userMetaName, $fileUrl);
+          }
 
         	$this->response = array(
         	    "status" => 'success',

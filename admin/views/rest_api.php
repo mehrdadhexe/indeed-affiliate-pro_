@@ -15,7 +15,23 @@
 			</div>
 
 
-
+			<p><?php _e( 'In order to use this REST API, you must do a basic authentication with your username and password.', 'uap' );?></p>
+			<p>
+					ex:
+					<code style="width:100px">
+						$wp_request_headers = array(
+						  'Authorization' => 'Basic ' . base64_encode( 'username:password' )
+						);
+						$wp_request_url = '{endpoint}';
+						$response = wp_remote_request(
+						  $wp_request_url,
+						  array(
+						      'method'    => 'POST',
+						      'headers'   => $wp_request_headers
+						  )
+						);
+					</code>
+			</p>
 
 			<div class="uap-submit-form" style="margin-top: 20px;">
 				<input type="submit" value="<?php _e('Save Changes', 'uap');?>" name="save" class="button button-primary button-large" />

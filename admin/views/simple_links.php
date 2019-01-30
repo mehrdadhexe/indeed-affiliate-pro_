@@ -7,7 +7,7 @@
 			<div class="row">
 				<div class="col-xs-7">
 				<h2><?php _e('Activate/Hold Simple Links', 'uap');?></h2>
-				<p><?php _e('An affiliate’s name can now be masked by creating custom links. Users will no longer avoid links that could benefit a certain affiliate.', 'uap');?></p>
+				<p><?php _e("An affiliate's name can now be masked by creating custom links. Users will no longer avoid links that could benefit a certain affiliate.", 'uap');?></p>
 				<label class="uap_label_shiwtch" style="margin:10px 0 10px -10px;">
 					<?php $checked = ($data['metas']['uap_simple_links_enabled']) ? 'checked' : '';?>
 					<input type="checkbox" class="uap-switch" onClick="uap_check_and_h(this, '#uap_simple_links_enabled');" <?php echo $checked;?> />
@@ -22,7 +22,7 @@
 				<div class="row" style="margin-left:0px;">
 					<div class="col-xs-4" style="margin-bottom: 10px;">
 						<h3><?php _e('Referrer Links Limit', 'uap');?></h3>
-						<p><?php _e('The number of links that can be submitted by an affiliate in his “Account Page”.', 'uap');?></p>
+						<p><?php _e('The number of links that can be submitted by an affiliate in his "Account Page".', 'uap');?></p>
 						<div class="input-group" style="margin:0px 0 15px 0;">
 							<span class="input-group-addon" id="basic-addon1"><?php _e('Links Limit per Affiliate', 'uap');?></span>										
 							<input type="number" min="0" step="1" class="uap-field-text-with-padding form-control" name="uap_simple_links_limit" value="<?php echo $data['metas']['uap_simple_links_limit'];?>" />
@@ -43,7 +43,7 @@
 		<div class="inside">	
 				<div class="row" style="margin-left:0px;">
 					<div class="col-xs-5" style="margin-bottom: 10px;">
-					<p><?php _e('Attach a referrer link to a specific affiliate user directly from the “UAP Dashboard”.', 'uap');?></p>
+					<p><?php _e('Attach a referrer link to a specific affiliate user directly from the "UAP Dashboard".', 'uap');?></p>
 						<div class="input-group" style="margin:0px 0 15px 0;">
 							<span class="input-group-addon" id="basic-addon1"><?php _e('Affiliate', 'uap');?></span>										
 							<input type="text" class="uap-field-text-with-padding form-control" name="affiliate_name" id="affiliate_name"/>				

@@ -6,7 +6,7 @@
 			<div class="row">
 				<div class="col-xs-7">
 					<h3><?php _e('Activate/Hold Affiliate Section', 'uap');?></h3>
-					<p><?php _e('Fully integrate a user’s “Affiliate Account” in their “WooCommerce MyAccount”. Once activated, a new tab in their “ Woo MyAccount” menu will show up.', 'uap');?></p>
+					<p><?php _e('Fully integrate a user "Affiliate Account" in their "WooCommerce MyAccount". Once activated, a new tab in their " Woo MyAccount" menu will show up.', 'uap');?></p>
 					<label class="uap_woo_account_page_enable" style="margin:10px 0 10px -10px;">
 					<?php $checked = ($data['metas']['uap_woo_account_page_enable']) ? 'checked' : '';?>
 					<input type="checkbox" class="uap-switch" onClick="uap_check_and_h(this, '#uap_woo_account_page_enable');" <?php echo $checked;?> />
@@ -37,7 +37,7 @@
 			<div class="row">
 				<div class="col-xs-7">
 					<h3><?php _e('Non-Affiliate Users', 'uap');?></h3>
-					<p><?php _e('Even the non-affiliate users will see the new option but instead of “Affiliate Account Page”, custom content will show up.', 'uap');?></p>
+					<p><?php _e('Even the non-affiliate users will see the new option but instead of "Affiliate Account Page", custom content will show up.', 'uap');?></p>
 					<label class="woo_account_page_enable" style="margin:10px 0 10px -10px;">
 					<?php $checked = ($data['metas']['uap_woo_account_page_show_to_everyone']) ? 'checked' : '';?>
 					<input type="checkbox" class="uap-switch" onClick="uap_check_and_h(this, '#uap_woo_account_page_show_to_everyone');" <?php echo $checked;?> />

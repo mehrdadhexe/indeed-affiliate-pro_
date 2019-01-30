@@ -1,12 +1,7 @@
 <div class="uap-wrapper">
 	<div class="uap-stuffbox">
 		<h3 class="uap-h3"><?php _e('Affiliate Payment Settings');?></h3>
-
-
-
 		<div class="inside">
-
-         
 			<?php
 			if (!empty($data['metas']['uap_affiliate_payment_type'])):
 				$types = array('stripe'=>'Stripe', 'paypal'=>'PayPal', 'bt'=>'Bank Transfer', 'stripe_v2' => 'Stripe V2');
@@ -26,12 +21,6 @@
 						<div><label><?php echo __("Bank Transfer Details:", 'uap');?></label> <?php echo $data['metas']['uap_affiliate_bank_transfer_data'];?></div>
 						<?php
 						break;
-                    case 'walet':
-						?>
-						<div><label><?php echo __("Wallet", 'uap');?></label> <?php echo $data['metas']['uap_affiliate_wallet_type'];?></div>
-						<?php
-						break;
-
 					case 'paypal':
 						?>
 						<div><label><?php echo __("PayPal E-mail Address:", 'uap');?></label> <?php echo $data['metas']['uap_affiliate_paypal_email'];?></div>

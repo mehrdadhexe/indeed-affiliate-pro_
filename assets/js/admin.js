@@ -437,26 +437,11 @@ function uap_approve_affiliate(i){
 }
 
 function uap_payment_form_payment_status(v){
-
-    jQuery('#do_payment_wallet').val(v);
 	if (v=='bank_transfer'){
 		jQuery('#payment_status_div').css('display', 'block');
 	} else {
 		jQuery('#payment_status_div').css('display', 'none');
 	}
-
-    if(v=='wallet') {
-    	jQuery('#payment_status_div_wallet').css('display', 'block');
-
-
-	} else {
-		jQuery('#payment_status_div_wallet').css('display', 'none');
-	}
-
-
-
-
-
 }
 
 function uap_do_delete(t, f){
@@ -920,5 +905,14 @@ function uap_make_export_file(){
 function uap_check_base_referral_link(v, u){
 		if (v.indexOf(u)==-1){
 				alert(jQuery('#base_referral_link_alert').html());
+		}
+}
+
+function uap_hide_div_if_value( checkValue, desiredValue, targetToHide )
+{
+		if ( checkValue==desiredValue ){
+				jQuery(targetToHide).css('display', 'none')
+		} else {
+				jQuery(targetToHide).css('display', 'block')				
 		}
 }

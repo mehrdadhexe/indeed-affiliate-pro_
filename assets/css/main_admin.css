@@ -2315,7 +2315,7 @@ i.mce-i-uap_btn_forms:after{
 		padding: 5px 0px;
 		padding-bottom:20px;
 }
-.progress-bar-parent{
+.uap-progress-bar-parent{
 		position: fixed;
     width: 100%;
     height: 100%;
@@ -2325,11 +2325,11 @@ i.mce-i-uap_btn_forms:after{
     z-index: 10;
 		text-align: center;
 }
-.progress-bar-parent .progress-bar{
+.uap-progress-bar-parent .progress-bar{
 		position: absolute;
 		width: 40%;
 }
-.progress{
+.uap-progress{
 		width: 40%;
     position: absolute;
     top: 33%;

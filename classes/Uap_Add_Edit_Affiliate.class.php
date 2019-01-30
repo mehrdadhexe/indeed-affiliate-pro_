@@ -758,7 +758,8 @@ if(!class_exists('Uap_Add_Edit_Affiliate')){
 				$class = (empty($v['class'])) ? '' : $v['class'];
 				$str .= '<div class="g-recaptcha-wrapper" class="' . $class . '">';
 				$str .= '<div class="g-recaptcha" data-sitekey="' . $key . '"></div>';
-				$str .= '<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=en"></script>';
+				$locale = indeed_get_current_language_code();
+				$str .= '<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=' . $locale . '"></script>';
 				$str .= '</div>';
 			}
 			return $str;
@@ -865,11 +866,16 @@ if(!class_exists('Uap_Add_Edit_Affiliate')){
 				$this->fields = apply_filters('uap_before_register_new_user', $this->fields);
 				$this->user_id = wp_insert_user($this->fields);
 				global $indeed_db;
-				$indeed_db->save_affiliate($this->user_id);
+				$saveAsAffiliate = apply_filters( 'uap_save_as_affiliate_filter', true );
+				if ( $saveAsAffiliate ){
+						$indeed_db->save_affiliate($this->user_id);
+				}
+				do_action('uap_on_register_action', $this->user_id);
 			} else {
 				//update user
 				$this->fields['ID'] = $this->user_id;
 				wp_update_user($this->fields);
+				do_action('uap_on_update_action', $this->user_id);
 			}
 
 			$this->do_opt_in();

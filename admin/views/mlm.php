@@ -90,7 +90,7 @@
 							<div class="col-xs-6">	
 						
 							<h3><?php _e('Amount For Each Level', 'uap');?></h3>
-							<p><?php _e('Set a special MLM amount for each level of your ranks. This option will also become available in the “Rank Settings” page.', 'uap');?></p>
+							<p><?php _e('Set a special MLM amount for each level of your ranks. This option will also become available in the "Rank Settings" page.', 'uap');?></p>
 						
 						<table class="uap-dashboard-inside-table" id="mlm-amount-for-each-level">
 							<thead>

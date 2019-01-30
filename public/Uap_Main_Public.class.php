@@ -204,7 +204,7 @@ if (!class_exists('Uap_Main_Public')){
 						require_once UAP_PATH . 'public/Uap_Login.class.php';
 						$object = new Uap_Login();
 						$current_url_check = explode("?", $this->current_url);
-						$this->current_url = $$current_url_check[0] ;
+						$this->current_url = $current_url_check[0];//$$current_url_check[0];
 
 						$object->do_login($this->current_url);
 						break;
@@ -459,6 +459,8 @@ if (!class_exists('Uap_Main_Public')){
 				 $fullPath = UAP_PATH . 'public/views/become_affiliate_bttn.php';
 				 $searchFilename = 'become_affiliate_bttn.php';
 				 $template = apply_filters('uap_filter_on_load_template', $fullPath, $searchFilename );
+				 $data['show_button'] = apply_filters('uap_become_affiliate_bttn', true);
+				 $data['warning_message'] = apply_filters('uap_become_affiliate_warning_message', '');
 
 				ob_start();
 			 	require_once $template;

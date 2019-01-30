@@ -633,7 +633,6 @@ if (!class_exists('Uap_Db')){
 									'reccuring_referrals',
 									'social_share',
 									'paypal',
-                                    'wallet',
 									'stripe',
 									'bonus_on_rank',
 									'pay_per_click',
@@ -663,6 +662,16 @@ if (!class_exists('Uap_Db')){
 			global $wpdb;
 			$table = $wpdb->prefix . "uap_banners";
 			$data = $wpdb->get_results("SELECT * FROM $table");
+			if ($data && !is_admin() ){ /// wpml
+					$domain = 'uap';
+					$languageCode = indeed_get_current_language_code();
+					foreach ($data as $object){
+							$wmplName = $object->id . '_name';
+							$object->name = apply_filters( 'wpml_translate_single_string', $object->name, $domain, $wmplName, $languageCode );
+							$wmplName = $object->id . '_description';
+							$object->description = apply_filters( 'wpml_translate_single_string', $object->description, $domain, $wmplName, $languageCode );
+					}
+			}
 			return (array)$data;
 		}
 
@@ -719,6 +728,7 @@ if (!class_exists('Uap_Db')){
 										WHERE id=%d
 						;", $post_data['name'], stripslashes_deep($post_data['description']), $post_data['url'], $post_data['image'], $post_data['status'], $post_data['id']);
 						$wpdb->query($q);
+						do_action( 'uap_banners_update', $post_data);
 						return;
 					}
 				}
@@ -728,6 +738,7 @@ if (!class_exists('Uap_Db')){
 							$post_data['name'], $post_data['description'], $post_data['url'], $post_data['image'], $post_data['status']
 				);
 				$wpdb->query($q);
+				do_action( 'uap_banners_save', $post_data);
 			}
 		}
 
@@ -964,13 +975,16 @@ if (!class_exists('Uap_Db')){
 			 return FALSE;
 		}
 
-		public function get_affiliates($limit=-1, $offset=-1, $count=FALSE, $order_by='', $order_type='', $where_conditions=array()){
+		public function get_affiliates($limit=-1, $offset=-1, $count=FALSE, $order_by='', $order_type='', $where_conditions=array(), $selectByRank=0){
 			/*
 			 * @param
 			 * @return array OR INT
 			 */
 			global $wpdb;
 			$ordertype_rank = (empty($_GET['ordertype_rank'])) ? '' : esc_sql($_GET['ordertype_rank']);
+			if (empty($ordertype_rank) && $selectByRank){
+					$ordertype_rank = $selectByRank;
+			}
 
 			$affiliates_table = $wpdb->prefix . 'uap_affiliates';
 			$user_table = $wpdb->base_prefix . 'users';
@@ -1289,6 +1303,7 @@ if (!class_exists('Uap_Db')){
 			 * @return none
 			 */
 			if (!empty($post_data)){
+				do_action( 'uap_save_notification_action', $post_data );
 				global $wpdb;
 				if (!$table){
 					$table = $wpdb->prefix . "uap_notifications";
@@ -1313,7 +1328,7 @@ if (!class_exists('Uap_Db')){
 						;", $post_data['type'], $post_data['rank_id'], stripslashes_deep($post_data['subject']), stripslashes_deep($post_data['message']),
 						stripslashes_deep($post_data['pushover_message']), $post_data['pushover_status'], $post_data['status'], $post_data['id']);
 						$wpdb->query($q);
-								return;
+						return;
 					}
 				}
 				/// SAVE
@@ -1530,7 +1545,7 @@ if (!class_exists('Uap_Db')){
 								   'uap_login_register' => 1,
 								   'uap_login_pass_lost' => 1,
 								   'uap_login_show_recaptcha' => 0,
-								   'uap_login_template' => 'uap-login-template-3',
+								   'uap_login_template' => 'uap-login-template-9',
 								   'uap_login_custom_css' => '',
 								);
 				break;
@@ -1637,7 +1652,7 @@ if (!class_exists('Uap_Db')){
 				break;
 				case 'register':
 					$arr = array(
-									'uap_register_template' => 'uap-register-3',
+									'uap_register_template' => 'uap-register-9',
 									'uap_register_admin_notify' => 1,
 									'uap_register_pass_min_length' => 6,
 									'uap_register_pass_options' => 1,
@@ -2174,7 +2189,15 @@ if (!class_exists('Uap_Db')){
 					$arr = array(
 									'uap_rest_api_enabled' => 0,
 					);
-					break;	
+					break;
+				case 'pay_to_become_affiliate':
+					$arr = array(
+									'uap_pay_to_become_affiliate_enabled'													=> 0,
+									'uap_pay_to_become_affiliate_target_product_group'						=> '',
+									'uap_pay_to_become_affiliate_target_all_products'							=> 0,
+									'uap_pay_to_become_affiliate_target_products'									=> '',
+					);
+					break;
 			}
 
 			if ($return_default){
@@ -2334,6 +2357,7 @@ if (!class_exists('Uap_Db')){
 						$post_data['rank_order'], $post_data['status'], $settings, $post_data['rank_order'], $post_data['id']
 						);
 						$wpdb->query($q);
+						do_action( 'uap_ranks_update', $post_data );
 						return;
 					}
 				}
@@ -2369,6 +2393,7 @@ if (!class_exists('Uap_Db')){
 					serialize($post_data['mlm_amount_value']), stripslashes_deep($post_data['achieve']), $settings, $post_data['rank_order'], $post_data['status']
 					);
 					$wpdb->query($q);
+					do_action( 'uap_ranks_save', $post_data );
 			}
 		}
 
@@ -2384,6 +2409,10 @@ if (!class_exists('Uap_Db')){
 				$data = $wpdb->get_row($q);
 				if ($data){
 					$data = (array)$data;
+					$domain = 'uap';
+					$languageCode = indeed_get_current_language_code();
+					$wmplName = 'rank_name_' . $data['id'];
+					$data['label'] = apply_filters( 'wpml_translate_single_string', $data['label'], $domain, $wmplName, $languageCode );
 					$settings = unserialize($data['settings']);
 					$data['color'] = (empty($settings['color'])) ? '' : $settings['color'];
 					$data['description'] = (empty($settings['description'])) ? '' : $settings['description'];
@@ -3883,7 +3912,10 @@ if (!class_exists('Uap_Db')){
 					break;
 				case 'rest_api':
 					return $temp_data['uap_rest_api_enabled'];
-					break;	
+					break;
+				case 'pay_to_become_affiliate':
+					return $temp_data['uap_pay_to_become_affiliate_enabled'];
+					break;
 			}
 			return FALSE;
 		}
@@ -4065,6 +4097,24 @@ if (!class_exists('Uap_Db')){
 				}
 			}
 			return $return;
+		}
+
+		public function getAllUserData($uid=0)
+		{
+				global $wpdb;
+				if (!$uid){
+						return [];
+				}
+				$query = $wpdb->prepare("SELECT * FROM {$wpdb->users} a INNER JOIN {$wpdb->usermeta} b ON a.ID=b.user_id WHERE a.ID=%d", $uid);
+				$data = $wpdb->get_results($query);
+				if (empty($data)){
+						return [];
+				}
+				$returnData = [];
+				foreach ($data as $object){
+						$returnData[] = (array)$object;
+				}
+				return $returnData;
 		}
 
 
@@ -4303,61 +4353,6 @@ if (!class_exists('Uap_Db')){
 			}
 		}
 
-        	public function add_payment_wallet($data=array()){
-			/*
-			 * @param array
-			 * @return none
-			 */
-			if ($data){
-				global $wpdb;
-
-				///get current payment details and store in into db
-				$data['payment_details'] = $this->get_current_payment_settings_for_affiliate_id($data['affiliate_id']);
-
-				$table = $wpdb->prefix . 'uap_payments';
-				$q = $wpdb->prepare("INSERT INTO $table VALUES( null,
-														 %s,
-														 %s,
-														 %s,
-														 %s,
-														 %s,
-														 %s,
-														 %s,
-														 %s,
-														 %s,
-														 '',
-														 %s
-				);", $data['payment_type'], $data['transaction_id'], $data['referral_ids'],
-				$data['affiliate_id'], $data['amount'], $data['currency'], $data['payment_details'],
-				$data['create_date'], $data['update_date'], $data['status']
-				);
-				$wpdb->query($q);
-                $uid_ref=$this->get_uid_by_affiliate_id($data['affiliate_id']);
-                if (class_exists('WooWallet'))
-              {
-
-
-                   $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
-                   //if ($tr_type=='wallet')
-                  // {
-                       woo_wallet()->wallet->credit($uid_ref,$data['amount'],'Checking By Admin');
-                  // }
-
-                   //else
-                   // {
-                   //   woo_wallet()->wallet->debit($uid_ref,$data['amount'],'Checking By Admin');
-                   // }
-
-
-
-              }
-				/// NOTIFICATION TO AFFILIATE
-				$id = $wpdb->insert_id;
-				$this->payments_send_affiliate_notification_by_status($id, $data['status']);
-			}
-		}
-
-
 		public function add_payment($data=array()){
 			/*
 			 * @param array
@@ -4387,25 +4382,7 @@ if (!class_exists('Uap_Db')){
 				$data['create_date'], $data['update_date'], $data['status']
 				);
 				$wpdb->query($q);
-                $uid_ref=$this->get_uid_by_affiliate_id($data['affiliate_id']);
-                if (class_exists('WooWallet'))
-              {
 
-
-                   $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
-                   if ($tr_type=='wallet')
-                   {
-                       woo_wallet()->wallet->credit($uid_ref,$data['amount'],'Checking By Admin');
-                   }
-
-                   else
-                    {
-                      woo_wallet()->wallet->debit($uid_ref,$data['amount'],'Checking By Admin');
-                    }
-
-
-
-              }
 				/// NOTIFICATION TO AFFILIATE
 				$id = $wpdb->insert_id;
 				$this->payments_send_affiliate_notification_by_status($id, $data['status']);
@@ -4638,11 +4615,6 @@ if (!class_exists('Uap_Db')){
 			 * @param int, int (0,1,2)
 			 * @return none
 			 */
-
-
-
-
-
 			if ($id){
 				global $wpdb;
 				/// update payments
@@ -4725,7 +4697,6 @@ if (!class_exists('Uap_Db')){
 				$table = $wpdb->prefix . 'uap_payments';
 				$q = $wpdb->prepare("SELECT referral_ids FROM $table WHERE id=%d ", $transaction_id);
 				$data = $wpdb->get_row($q);
-                $amount= $data->amount;
 				if (!empty($data->referral_ids)){
 					$ids = explode(',', $data->referral_ids);
 					if ($ids){
@@ -4733,23 +4704,6 @@ if (!class_exists('Uap_Db')){
 						foreach ($ids as $id){
 								$q = $wpdb->prepare("UPDATE $table SET payment='0' WHERE id=%d ", $id);
 								$wpdb->query($q);
-                               /* $uid_ref=$this->get_uid_by_affiliate_id($id);
-                                 if (class_exists('WooWallet'))
-                                  {
-
-
-                                  $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
-                                   if ($tr_type=='wallet')
-                                      woo_wallet()->wallet->credit($uid_ref,$amount,'Checking By Admin');
-                                    else
-                                    {
-                                      woo_wallet()->wallet->debit($uid_ref,$amount,'Checking By Admin');
-                                    }
-                                 }
-*/
-
-
-
 						}
 						$table = $wpdb->prefix . 'uap_payments';
 						$q = $wpdb->prepare("DELETE FROM $table WHERE id=%d ", $transaction_id);
@@ -5695,49 +5649,7 @@ if (!class_exists('Uap_Db')){
 			}
 			return '';
 		}
-        	public function update_wallet_transactions(){
-			/*
-			 * @param none
-			 * @return none
-			 */
-			global $wpdb;
-			$table = $wpdb->base_prefix . 'uap_payments';
-			$data = $wpdb->get_results("SELECT transaction_id, id FROM $table
-											WHERE 1=1
-											AND payment_type='wallet'
-											AND status=1
-											ORDER BY update_date DESC
-			");
-			if (!empty($data)){
-				require_once UAP_PATH . 'classes/Uap_PayPal.class.php';
-				foreach ($data as $object){
-					$paypal = new Uap_PayPal();
-					$status = $paypal->get_status($object->transaction_id);
-					$this->update_transaction_payment_special_status($object->id, $status);
-					switch ($status){
-						case 'SUCCESS':
-							$this->change_transaction_status($object->id, 2);
-							break;
-						case 'DENIED':
-						case 'FAILED':
-						case 'UNCLAIMED':
-						case 'RETURNED':
-						case 'ONHOLD':
-						case 'BLOCKED':
-						case 'CANCELLED':
-							$this->change_transaction_status($object->id, 0);
-							break;
-						case 'PENDING':
-						case 'PROCESSIN':
-						default:
-							$this->change_transaction_status($object->id, 1);
-							break;
-					}
 
-				}
-				unset($paypal);
-			}
-		}
 		public function update_paypal_transactions(){
 			/*
 			 * @param none
@@ -6001,7 +5913,6 @@ if (!class_exists('Uap_Db')){
 			 */
 			$array = array(
 							'uap_affiliate_payment_type' => 'bt',
-                            'uap_affiliate_wallet_type' => '',
 							///BT
 							'uap_affiliate_bank_transfer_data' => '',
 							/// PAYPAL
@@ -6091,11 +6002,6 @@ if (!class_exists('Uap_Db')){
 						$data['is_active'] = (empty($temp['uap_affiliate_paypal_email'])) ? FALSE : TRUE;
 						$data['settings'] = $temp['uap_affiliate_paypal_email'];
 						break;
-
-                   case 'wallet':
-					  $data['is_active'] = (empty($temp['uap_affiliate_wallet_type'])) ? FALSE : TRUE;
-					  $data['settings'] = $temp['uap_affiliate_wallet_type'];
-					  break;
 					case 'bt':
 						$data['is_active'] = (empty($temp['uap_affiliate_bank_transfer_data'])) ? FALSE : TRUE;
 						$data['settings'] = $temp['uap_affiliate_bank_transfer_data'];
@@ -6185,21 +6091,7 @@ if (!class_exists('Uap_Db')){
 			 * @param stirng
 			 * @return boolean
 			 */
-			if (!empty($code)){
-				if (!class_exists('Envato_marketplace')){
-					require_once UAP_PATH . 'classes/Envato_marketplace.class.php';
-				}
-				$api_key = 'z4dqvsth70g7qsr4f385fxjdt6wz9dfg';
-				$user_name = 'azzaroco';
-				$item_id = '16527729';
-				$envato_object = new Envato_marketplaces($api_key);
-				$buyer_verify = $envato_object->verify_purchase($user_name, $code);
-
-				if ( isset($buyer_verify) && isset($buyer_verify->buyer)  && $buyer_verify->item_id==$item_id ){
-					return TRUE;
-				}
-			}
-			return FALSE;
+			return TRUE;
 		}
 
 		public function envato_licensing($code=''){
@@ -6207,23 +6099,19 @@ if (!class_exists('Uap_Db')){
 			 * @param string
 			 * @return boolean
 			 */
-			/* POSTED BY CODEXINH.COM */
-			update_option('uap_license_set', 1);
-			update_option('uap_envato_code', 'NULLED BY CODEXINH.COM');
-			return TRUE;
-		}
+	 $return = FALSE;
+	          update_option('uap_license_set', 1);
+	          $return = TRUE;
+	      update_option('uap_envato_code', "NULLED BY GANJAPARKER");
+	      return $return;
+	  }
 
 		public function envato_check_license(){
 			/*
 			 * @param none
 			 * @return bool
 			 */
-			$check = get_option('uap_license_set');
-			if ($check!==FALSE){
-				if ($check==1)
-					return TRUE;
-				return FALSE;
-			}
+			
 			return TRUE;
 		}
 
@@ -6269,7 +6157,6 @@ if (!class_exists('Uap_Db')){
 			 $payments = array(
 								'bt' => __('Bank Transfer', 'uap'),
 								'paypal' => __('PayPal', 'uap'),
-                                'wallet' => __('Wallet', 'uap'),
 								'stripe' => __('Stripe', 'uap'),
 								'stripe_v2' => __('Stripe Managed Accounts', 'uap'),
 			 );
@@ -6278,9 +6165,6 @@ if (!class_exists('Uap_Db')){
 			 }
 			 if (!$this->is_magic_feat_enable('stripe') || (defined('UAP_LICENSE_SET') && !UAP_LICENSE_SET)){
 			 	unset($payments['stripe']);
-			 }
-             if (!$this->is_magic_feat_enable('wallet') || (defined('UAP_LICENSE_SET') && !UAP_LICENSE_SET)){
-			 	unset($payments['wallet']);
 			 }
 			 if (!$this->is_magic_feat_enable('stripe_v2') || (defined('UAP_LICENSE_SET') && !UAP_LICENSE_SET)){
 			 	unset($payments['stripe_v2']);
@@ -6725,6 +6609,16 @@ if (!class_exists('Uap_Db')){
 				 }
 			 }
 			 return '';
+		}
+
+		public function getUserMetaValue($uid=0, $metaKey='')
+		{
+				global $wpdb;
+				if (!$uid){
+						return false;
+				}
+				$query = $wpdb->prepare("SELECT meta_value FROM {$wpdb->usermeta} WHERE user_id=%d AND meta_key=%s ", $uid, $metaKey);
+				return $wpdb->get_var($query);
 		}
 
 		public function get_affiliate_id_by_custom_slug($slug=''){
@@ -7559,7 +7453,7 @@ if (!class_exists('Uap_Db')){
 							'label' => __('Social Share', 'uap'),
 							'link' => admin_url('admin.php?page=ultimate_affiliates_pro&tab=magic_features&subtab=social_share'),
 							'icon' => 'fa-share-alt-uap',
-							'description' => __('Provides social share buttons for affiliate links using “Social Share & Locker”', 'uap'),
+							'description' => __('Provides social share buttons for affiliate links using "Social Share & Locker"', 'uap'),
 							'enabled' => $this->is_magic_feat_enable('social_share'),
 							'extra_class' => '',
 					),
@@ -7836,6 +7730,14 @@ if (!class_exists('Uap_Db')){
 							'extra_class' => '',
 							'description' => __('CRUD actions for main affiliate system data', 'uap'),
 							'enabled' => $this->is_magic_feat_enable('rest_api'),
+					),
+					'pay_to_become_affiliate'	=> array(
+							'label' => __('Pay to become Affiliate', 'uap'),
+							'link' => admin_url('admin.php?page=ultimate_affiliates_pro&tab=magic_features&subtab=pay_to_become_affiliate'),
+							'icon' => 'fa-money-uap',
+							'extra_class' => '',
+							'description' => __('Charge your users that wants to become affiliates.', 'uap'),
+							'enabled' => $this->is_magic_feat_enable('pay_to_become_affiliate'),
 					),
 			);
 		}
@@ -8129,18 +8031,18 @@ if (!class_exists('Uap_Db')){
 					switch ($temp_meta['uap_affiliate_payment_type']){
 						case 'paypal':
 							$return['uap_affiliate_paypal_email'] = array(
-																					'label' => 'PayPal E-mail Address',
+																					'label' => __('PayPal E-mail Address', 'uap'),
 												 									'value' => $temp_meta['uap_affiliate_paypal_email'],
 							);
 							break;
 						case 'stripe':
 							$return = array(
 											'uap_affiliate_stripe_name' => array(
-																					'label' => 'Name on Card',
+																					'label' => __('Name on Card', 'uap'),
 																					'value' => $temp_meta['uap_affiliate_stripe_name'],
 											),
 											'uap_affiliate_stripe_card_number' => array(
-																					'label' => 'Card Number',
+																					'label' => __('Card Number', 'uap'),
 																					'value' => $temp_meta['uap_affiliate_stripe_card_number'],
 											),
 											/*
@@ -8150,22 +8052,22 @@ if (!class_exists('Uap_Db')){
 											),
 											*/
 											'uap_affiliate_stripe_expiration_month' => array(
-																					'label' => 'Expiration Month',
+																					'label' => __('Expiration Month', 'uap'),
 																					'value' => $temp_meta['uap_affiliate_stripe_expiration_month'],
 											),
 											'uap_affiliate_stripe_expiration_year' => array(
-																					'label' => 'Expiration Year',
+																					'label' => __('Expiration Year', 'uap'),
 																					'value' => $temp_meta['uap_affiliate_stripe_expiration_year'],
 											),
 											'uap_affiliate_stripe_card_type' => array(
-																					'label' => 'Card Type',
+																					'label' => __('Card Type', 'uap'),
 																					'value' => $temp_meta['uap_affiliate_stripe_card_type'],
 											),
 							);
 							break;
 						case 'bt':
 							$return['uap_affiliate_bank_transfer_data'] = array(
-																					'label' => 'Bank Transfer Details',
+																					'label' => __('Bank Transfer Details', 'uap'),
 												 									'value' => $temp_meta['uap_affiliate_bank_transfer_data'],
 							);
 							break;
@@ -8892,5 +8794,181 @@ if (!class_exists('Uap_Db')){
 				return round($epc_data,2);
 
 		}
+
+		public function get_user_col_value($uid=0, $col_name=''){
+			if ($uid && $col_name){
+				global $wpdb;
+				$table = $wpdb->base_prefix . 'users';
+				$col_name = esc_sql($col_name);
+				$q = $wpdb->prepare("SELECT $col_name FROM $table WHERE ID=%d;", $uid);
+				$data = $wpdb->get_row($q);
+				if (!empty($data->$col_name)){
+					return $data->$col_name;
+				}
+			}
+		}
+
+		public function getUserFullName($uid=0){
+				if (empty($uid)) return '';
+				$uid = esc_sql($uid);
+				$first = get_user_meta($uid, 'first_name', TRUE);
+				$last = get_user_meta($uid, 'last_name', TRUE);
+				if($first != '' || $last != '')
+					return $first . ' ' . $last;
+
+				$nickname = get_user_meta($uid, 'nickname', TRUE);
+				return $nickname;
+		}
+
+		public function doApproveAffiliate($affiliateId=0)
+		{
+				if (empty($affiliateId)){
+					return false;
+				}
+				$uid = $this->get_uid_by_affiliate_id($affiliateId);
+				if (empty($uid)){
+					return false;
+				}
+				$role = get_option('uap_after_approve_role');
+				if (empty($role)){
+						$role = get_option('default_role');
+				}
+				$new_role = empty($role) ? 'subscriber' : $role;
+				$uid = wp_update_user(array( 'ID' => $uid, 'role' => $new_role));
+				uap_send_user_notifications($uid, 'affiliate_account_approve');
+		}
+
+		public function modifyGuid( $postId=0, $newValue='' )
+		{
+				global $wpdb;
+				if ( !$postId ){
+						return;
+				}
+				$query = $wpdb->prepare( "UPDATE {$wpdb->posts} SET guid=%s WHERE ID=%d ;", $newValue, $postId );
+				return $wpdb->query( $query );
+		}
+
+		public function updateAttachmentMetadataFileUrl( $postId=0, $fileUrl='' )
+		{
+				if ( !$postId || !$fileUrl ){
+						return false;
+				}
+				$data = get_post_meta( $postId, '_wp_attachment_metadata', true);
+				if ( !$data ){
+						return false;
+				}
+				$data['file'] = $fileUrl;
+				return update_post_meta( $postId, '_wp_attachment_metadata', $data);
+		}
+
+		public function getMediaBaseImage( $mediaId=0 )
+		{
+				global $wpdb;
+				if ( !$mediaId ){
+						return false;
+				}
+				$data = get_post_meta( $mediaId, '_wp_attachment_metadata', true);
+				if ( !$data || empty($data['file']) ){
+						return false;
+				}
+				return $data['file'];
+		}
+
+		public function countUsersWithRole( $role='' )
+		{
+				global $wpdb;
+				if ( !$role ){
+						return 0;
+				}
+				$role = esc_sql( $role );
+				$query = "SELECT COUNT(user_id) FROM {$wpdb->usermeta} WHERE meta_key='{$wpdb->prefix}capabilities' AND meta_value LIKE '%{$role}%' ";
+				return $wpdb->get_var( $query );
+		}
+
+		public function doesProductPayForAffiliate( $productId=0 )
+		{
+				if ( !$productId ){
+						return false;
+				}
+				$allProducts = get_option( 'uap_pay_to_become_affiliate_target_all_products' );
+				if ( $allProducts ){
+						return true;
+				}
+				$productsString = get_option( 'uap_pay_to_become_affiliate_target_products' );
+				if ( !$productsString ){
+						return false;
+				}
+				$products = explode( ',', $productsString );
+				if ( !$products ){
+						return false;
+				}
+				if ( in_array( $productId, $products ) ){
+						return true;
+				}
+				return false;
+		}
+
+		public function canUserBecomeAffiliateUmpWooCheck( $uid=0 )
+		{
+				global $wpdb;
+				if ( !$uid ){
+						return false;
+				}
+
+				$type = get_option( 'uap_pay_to_become_affiliate_target_product_group' );
+
+				if ( $type == 'ump' ){
+						/// ump
+						if ( class_exists('Ihc_Db') ){
+								$levels = \Ihc_Db::get_user_levels( $uid );
+						}
+						if ( empty($levels) ){
+								return false;
+						}
+						foreach ($levels as $lid){
+								if ( self::doesProductPayForAffiliate( $lid ) ){
+										return true;
+								}
+						}
+				} else {
+						/// woo
+						if ( function_exists('wc_get_order_types') && function_exists( 'wc_get_order_types' ) ){
+								$wooOrders = get_posts( array(
+												'numberposts' => -1,
+												'meta_key'    => '_customer_user',
+												'meta_value'  => $uid,
+												'post_type'   => wc_get_order_types(),
+												'post_status' => array_keys( wc_get_order_statuses() ),  //'post_status' => array('wc-completed', 'wc-processing'),
+								) );
+								if ( empty($wooOrders) ){
+										return false;
+								}
+
+								foreach ( $wooOrders as $order ){
+										$orderObject = new \WC_Order( $order->ID );
+										if ( !$orderObject ){
+												continue;
+										}
+										$items = $orderObject->get_items();
+										foreach ($items as $item){ /// foreach in lines
+												if ( $this->doesProductPayForAffiliate( $item['product_id'] ) ){
+														return true;
+												}
+										}
+								}
+						}
+				}
+				return false;
+		}
+
+		public function setDefaultRoleForUser( $uid=0 )
+		{
+				if ( !$uid ){
+						return false;
+				}
+				$currentRank = get_option('uap_register_new_user_rank');
+				return $this->update_affiliate_rank_by_uid( $uid, $currentRank );
+		}
+
 	}//end of class
 }//end if

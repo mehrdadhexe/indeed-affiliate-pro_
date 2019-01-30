@@ -7,18 +7,20 @@
 <?php   if (!empty($data['uap_account_page_custom_css'])) echo $data['uap_account_page_custom_css'];?>
 </style>
 
-<link href='<?php echo UAP_URL . 'assets/css/croppic.css';?>' rel='stylesheet' type='text/css' />
-<script src="<?php echo UAP_URL . 'assets/js/jquery.mousewheel.min.js';?>"></script>
-<script src="<?php echo UAP_URL . 'assets/js/croppic.js';?>"></script>
-<script src="<?php echo UAP_URL . 'assets/js/account_page-banner.js';?>"></script>
+<?php wp_enqueue_style( 'uap-croppic_css', UAP_URL . 'assets/css/croppic.css' );?>
+<?php wp_enqueue_script( 'uap-jquery_mousewheel', UAP_URL . 'assets/js/jquery.mousewheel.min.js', array(), null );?>
+<?php wp_enqueue_script( 'uap-croppic', UAP_URL . 'assets/js/croppic.js', array(), null );?>
+<?php wp_enqueue_script( 'uap-account_page-banner', UAP_URL . 'assets/js/account_page-banner.js', array(), null );?>
 
 <script>
-UapAccountPageBanner.init({
-		triggerId					: 'js_uap_edit_top_ap_banner',
-		saveImageTarget		: '<?php echo UAP_URL . 'public/ajax-upload.php';?>',
-		cropImageTarget   : '<?php echo UAP_URL . 'public/ajax-upload.php';?>',
-		bannerClass       : 'uap-user-page-top-background'
-});
+jQuery(document).ready(function(){
+		UapAccountPageBanner.init({
+				triggerId					: 'js_uap_edit_top_ap_banner',
+				saveImageTarget		: '<?php echo UAP_URL . 'public/ajax-upload.php';?>',
+				cropImageTarget   : '<?php echo UAP_URL . 'public/ajax-upload.php';?>',
+				bannerClass       : 'uap-user-page-top-background'
+		})
+})
 </script>
 
 <div class="uap-user-page-wrapper">
@@ -98,8 +100,8 @@ UapAccountPageBanner.init({
 
 		if (empty($banner) && !empty($data ['top_banner'])):
 			$banner = $data ['top_banner'];
-		elseif (empty($banner) && !empty($data ['top-background-image'])): 
-			$banner = $data ['top-background-image'];	
+		elseif (empty($banner) && !empty($data ['top-background-image'])):
+			$banner = $data ['top-background-image'];
 		endif;
 		if (!empty($banner)){
 				$bkStyle = 'style="background-image:url('.$banner.');"';

@@ -98,7 +98,7 @@ class Envato_marketplaces {
    */ 
    public function verify_purchase($user_name, $purchase_code)
    {
-      $validity = $this->private_user_data($user_name, 'verify-purchase', $purchase_code);
+	  $validity = $this->private_user_data($user_name, 'verify-purchase', $purchase_code);
       return isset($validity->buyer) ? $validity : false;
    }
 

@@ -19,7 +19,6 @@
 					<option value=""><?php _e('All', 'uap');?></option>
 					<option value="bank_transfer"><?php _e('Bank Transfer', 'uap');?></option>
 					<option value="paypal"><?php _e('Paypal', 'uap');?></option>
-                    	<option value="Wallet"><?php _e('Wallet', 'uap');?></option>
 					<option value="stripe"><?php _e('Stripe', 'uap');?></option>
 					<option value="stripe_v2"><?php _e('Stripe v2', 'uap');?></option>
 				</select>

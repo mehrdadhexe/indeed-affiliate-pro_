@@ -66,9 +66,9 @@
 						?>
 						<li><?php _e('1. Go to', 'uap');?> <a href="http://stripe.com" target="_blank">http://stripe.com</a> <?php _e(' and login with username and password.', 'uap');?></li>
 						<li><?php _e('2. Click on "Dashboard", and then select "Your account" -> "Account settings".', 'uap');?></li>
-						<li><?php _e('3. A popup will appear and you must go to API Keys, here you will find the “Secret Key” and “Publishable Key”.', 'uap');?></li>
-						<li><?php echo __('4. Don\'t forget to set Your Webhook at: ', 'uap') . '<b>' . $notification_url . '</b>';?></li>
-						<li><?php _e('5. Be sure you use the same currency in the Stripe account and in the “Ultimate Affiliate Pro” settings.', 'uap');?></li>
+						<li><?php _e('3. A popup will appear and you must go to API Keys, here you will find the "Secret Key" and "Publishable Key".', 'uap');?></li>
+						<li><?php echo __('4. Do notforget to set Your Webhook at: ', 'uap') . '<b>' . $notification_url . '</b>';?></li>
+						<li><?php _e('5. Be sure you use the same currency in the Stripe account and in the "Ultimate Affiliate Pro" settings.', 'uap');?></li>
 						<li><?php echo __('For testing purposes, you can find card credentials here: ', 'uap') . '<a href="https://stripe.com/docs/testing#test-debit-card-numbers" target="_blank">https://stripe.com/docs/testing#test-debit-card-numbers</a>';?></li>
 					</ul>			
 				</div>

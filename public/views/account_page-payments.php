@@ -27,7 +27,7 @@
 				</tr>
 			</thead>
 			<tfoot>
-				<tr>
+				<tr>	
 					<th><?php _e('Amount', 'uap');?></th>
 					<th><?php _e('Payment Type', 'uap');?></th>
 					<th><?php _e('Create Date', 'uap');?></th>
@@ -38,17 +38,8 @@
 			<tbody class="uap-alternate">
 				<?php foreach ($data['listing_items'] as $key => $array): ?>
 				<tr>
-                      <?php
-                          $payment_type =$array['payment_type'];
-                          if($array['payment_type']=='wallet')
-                             $payment_type ='Wallet';
-                         else if($array['payment_type']=='bank_transfer')
-                             $payment_type = 'Bank Transfer';
-
-                       ?>
-              <!--  $array['payment_type'] -->
 					<td style="font-weight:bold;"><?php echo uap_format_price_and_currency($array['currency'], $array['amount']);?></td>
-					<td><?php echo _e($payment_type, 'uap');?></td>
+					<td><?php echo __($array['payment_type'], 'uap');?></td>
 					<td><?php echo uap_convert_date_to_us_format($array['create_date']);?></td>
 					<td><?php echo uap_convert_date_to_us_format($array['update_date']);?></td>
 					<td class="uap-special-label"><?php

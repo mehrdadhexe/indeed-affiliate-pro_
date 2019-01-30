@@ -1,7 +1,6 @@
 /*
  * CROPPIC
  * dependancy: jQuery
- * author: Ognjen "Zmaj Džedaj" Božičković and Mat Steinlin
  */
 
 (function (window, document) {
@@ -49,6 +48,16 @@
 			onAfterRemoveCroppedImg: null,
 			onError: null,
 
+			/// new options added by indeed team
+			imgInitW						: 0,
+			imgInitH						: 0,
+			imgW								: 0,
+			imgH								: 0,
+			objW								: 0,
+			objH								: 0,
+			imageAppendAfter		: true,
+			customIdentificator : '',
+
 		};
 
 		// OVERWRITE DEFAULT OPTIONS
@@ -91,12 +100,15 @@
 		cropControlRemoveCroppedImage:{},
 		modal:{},
 		loader:{},
+		uploadId:0,
 
 		init: function () {
 			var that = this;
 
 			that.objW = that.obj.width();
 			that.objH = that.obj.height();
+
+			that.setSizes()
 
 			// reset rotation
 			that.actualRotation = 0;
@@ -111,6 +123,25 @@
 				that.loadExistingImage();
 			}
 
+		},
+
+		setSizes: function(){
+				var that = this
+
+				var options = {
+					imgInitW:0,
+					imgInitH:0,
+					imgW:0,
+					imgH:0,
+					objW:0,
+					objH:0,
+					customIdentificator:0,
+				}
+				for (i in options){
+					if (that.options[i] > 0){
+						that[i] = that.options[i]
+					}
+				}
 		},
 
 		isEmptyObject: function(param){
@@ -138,7 +169,6 @@
 
 			if(that.options.customUploadButtonId ===''){ that.imgUploadControl = that.outputDiv.find('.cropControlUpload'); }
 			else{	that.imgUploadControl = jQuery('#'+that.options.customUploadButtonId); that.imgUploadControl.show();	}
-
 			if( !that.isEmptyObject(that.croppedImg)){
 				that.cropControlRemoveCroppedImage = that.outputDiv.find('.cropControlRemoveCroppedImage');
 			}
@@ -307,6 +337,7 @@
 
             if (response.status == 'success') {
 
+								that.uploadId = response.uploadId
                 that.imgInitW = that.imgW = response.width;
                 that.imgInitH = that.imgH = response.height;
 
@@ -317,12 +348,13 @@
 
                 var img = jQuery('<img src="'+response.url+'">')
 
+
 				that.obj.append(img);
 
 				img.load(function(){
 					that.initCropper();
 					that.hideLoader();
-					if (that.options.onAfterImgUpload) that.options.onAfterImgUpload.call(that);
+					if (that.options.onAfterImgUpload) that.options.onAfterImgUpload.call(that, response);
 				});
 
                 if (that.options.onAfterImgUpload) that.options.onAfterImgUpload.call(that);
@@ -341,7 +373,7 @@
 			var that = this;
 
 			var marginTop = that.windowH/2-that.objH/2;
-			var modalHTML =  '<div id="croppicModal">'+'<div id="croppicModalObj" style="width:'+ that.objW +'px; height:'+ that.objH +'px; margin:0 auto; margin-top:'+ marginTop +'px; position: relative;"> </div>'+'</div>';
+			var modalHTML =  '<div id="croppicModal">'+'<div id="croppicModalObj" style="width:'+ that.objW +'px; height:'+ that.objH +'px; margin:0 auto; margin-top:'+ marginTop +'px; position: relative; max-width:100%;"> </div>'+'</div>';
 
 			jQuery('body').append(modalHTML);
 
@@ -631,7 +663,9 @@
 					imgX1:Math.abs( parseInt( that.img.css('left') ) ),
 					cropH:that.objH,
 					cropW:that.objW,
-					rotation:that.actualRotation
+					rotation:that.actualRotation,
+					customIdentificator: that.options.customIdentificator,
+					uploadId:that.uploadId
 				};
 
 			var formData;
@@ -712,7 +746,10 @@
 
                 that.destroy();
 
-                that.obj.append('<img class="croppedImg" src="' + response.url + '">');
+								if (that.options.imageAppendAfter){
+		                that.obj.append('<img class="croppedImg" src="' + response.url + '">');
+								}
+
                 if (that.options.outputUrlId !== '') { jQuery('#' + that.options.outputUrlId).val(response.url); }
 
                 that.croppedImg = that.obj.find('.croppedImg');
@@ -744,7 +781,6 @@
 			var that = this;
 			that.destroy();
 
-			that.init();
 
 			if( !that.isEmptyObject(that.croppedImg)){
 				that.obj.append(that.croppedImg);
@@ -752,6 +788,7 @@
 			}
 			if (typeof that.options.onReset == 'function')
                 that.options.onReset.call(that);
+			that.init();
 		},
 		destroy:function(){
 			var that = this;

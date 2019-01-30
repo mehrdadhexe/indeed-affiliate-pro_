@@ -775,9 +775,9 @@ class Uap_Ajax{
 					die;
 			}
 
-			$from_name = get_option('uap_notifications_from_name');
+			$from_name = get_option('uap_notification_name');
 			$from_name = stripslashes($from_name);
-			if (!empty($from) && !empty($from_name)){
+			if (!empty($from) ){ // && !empty($from_name)
 				$headers[] = "From: $from_name <$from>";
 			}
 			$headers[] = 'Content-Type: text/html; charset=UTF-8';

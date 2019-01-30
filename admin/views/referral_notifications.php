@@ -6,7 +6,7 @@
 			<div class="row">
 				<div class="col-xs-7">
 					<h3><?php _e('Activate/Hold Referral Notifications', 'uap');?></h3>
-					<p><?php _e('If this module is activated, affiliates have the option to receive instant notifications when they get new referrals. The affiliate can decide from his “Account Page” which type of referrals he will be notified of via email.', 'uap');?></p>
+					<p><?php _e('If this module is activated, affiliates have the option to receive instant notifications when they get new referrals. The affiliate can decide from his "Account Page" which type of referrals he will be notified of via email.', 'uap');?></p>
 					<label class="uap_bp_account_page_enable" style="margin:10px 0 10px -10px;">
 					<?php $checked = ($data['metas']['uap_referral_notifications_enable']) ? 'checked' : '';?>
 					<input type="checkbox" class="uap-switch" onClick="uap_check_and_h(this, '#uap_referral_notifications_enable');" <?php echo $checked;?> />

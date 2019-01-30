@@ -84,7 +84,7 @@
 	<div class="uap-ap-field">
 		<label class="uap-ap-label uap-special-label"><?php _e("Specific URL:", 'uap');?> </label> 
 		<input type="text" value="" id="ia_generate_aff_custom_url"  class="uap-public-form-control ">
-		<span style="font-style:italic; color:#666;"><?php _e("Enter any URL from this website in the form below to generate a referral link!", 'uap');?></span>
+		<span style="font-style:italic; color:#666;"><?php _e("Enter any URL from this website in the form above to generate a referral link!", 'uap');?></span>
 	</div>
 	<div class="uap-ap-generate-links-result" style="visibility: hidden;"></div>
 	<div class="uap-ap-generate-social-result" style="visibility: hidden;"></div>

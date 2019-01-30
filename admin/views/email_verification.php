@@ -14,7 +14,7 @@
 					</label>
 					<input type="hidden" name="uap_register_double_email_verification" value="<?php echo $data['metas']['uap_register_double_email_verification'];?>" id="uap_register_double_email_verification" /> 	
 					<p>
-						<?php _e('Be sure that your notifications for “<strong>Double Email Verification</strong>” are properly set.', 'uap');?>							
+						<?php _e('Be sure that your notifications for "<strong>Double Email Verification</strong>" are properly set.', 'uap');?>							
 					</p>					
 				</div>
 			</div>

@@ -31,7 +31,7 @@ $enabled = uap_is_social_share_intalled_and_active();
 						<div class="row">
 						<div class="col-xs-6">
 							<h3><?php _e('Shortcode', 'uap');?></h3>	
-							<p><?php _e('You can generate the social share shortcode from the “Social Share & Locker” dashboard and paste it here.', 'uap');?></p>
+							<p><?php _e('You can generate the social share shortcode from the "Social Share & Locker" dashboard and paste it here.', 'uap');?></p>
 							<p><?php 
 								if ($enabled){
 									echo '<a href="' . $data['social_share_page'] . '" target="_blank">' . __('Click here', 'uap') . '</a>' . __(' to grab a new shortcode.', 'uap');

@@ -37,7 +37,7 @@
 				<div class="row" style="margin-left:0px;">
 					<div class="col-xs-4" style="margin-bottom: 10px;">
 						<h3><?php _e('Max Amount Limit for Each Rank', 'uap');?></h3>
-						<p><?php _e('Set a special max amount limit for each rank. This option will also become available in the “Rank Settings” page.', 'uap');?></p>
+						<p><?php _e('Set a special max amount limit for each rank. This option will also become available in the "Rank Settings" page.', 'uap');?></p>
 						
 				<?php foreach ($data['ranks'] as $rank_data):?>		
 								<div class="input-group" style="margin:0px 0 15px 0;">

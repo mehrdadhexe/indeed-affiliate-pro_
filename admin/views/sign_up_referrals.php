@@ -47,7 +47,7 @@
 						<div class="col-xs-4">
 						<?php if (!empty($data['rank_list'])) :?>
 						<h3><?php _e('Amount For Each Rank', 'uap');?></h3>
-							<p><?php _e('Set a special sign up amount for each rank. This option will also become available in the “Rank Settings” page.', 'uap');?></p>
+							<p><?php _e('Set a special sign up amount for each rank. This option will also become available in the "Rank Settings" page.', 'uap');?></p>
 						<?php foreach ($data['rank_list'] as $id=>$label) :?>
 								<div class="input-group" style="margin-bottom:20px;">
 									<span class="input-group-addon" id="basic-addon1"><?php echo $label;?></span>

@@ -47,6 +47,9 @@ else if (isset($_FILES['img'])){
 
 else if (isset($_POST['imgUrl'])){
 		$cropImage = new Indeed\Uap\CropImage();
+		if ( isset($_POST['customIdentificator']) && $_POST['customIdentificator']=='image' ){
+				$cropImage->setSaveUserMeta( false );
+		}
 		echo $cropImage->cropImage($_POST)
 									 ->getResponse();
 }

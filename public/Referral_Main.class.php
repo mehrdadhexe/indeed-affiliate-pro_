@@ -7,7 +7,6 @@
 if (!class_exists('Referral_Main')):
 
 class Referral_Main{
-    
 	protected static $user_id;
 	protected static $affiliate_id;
 	protected static $source;
@@ -16,8 +15,6 @@ class Referral_Main{
 	protected static $currency;
 	protected static $special_payment_type = '';
 	protected static $coupon_code = '';
-    private $source_type = 'woo';
-	private static $checkout_referrals_select_settings = array();
 
 	public function __construct($user_id=0, $affiliate_id=0){
 		/*
@@ -266,274 +263,15 @@ class Referral_Main{
 		}
 	}
 
-
-
-
-
-
-
-
-
-
-   	public function insert_app_referral($user_id=0,$order_id=0){
-        global $indeed_db;
-
-        $order = new WC_Order($order_id);
-        $items = $order->get_items();
-
-		if (get_option('uap_sign_up_referrals_enable') && $user_id){
-			self::$user_id = $user_id;
-			$this->set_affiliate_id();
-            $moaref_name="";
-            if ( isset( $_POST['moaref_name'] ) )
-            {
-                $moaref_name= $_POST['moaref_name'];
-                $user = get_user_by( 'user_login',$moaref_name);
-                $refi=$user->ID;
-                self::$affiliate_id=$indeed_db->affiliate_get_id_by_uid($refi);
-            }
-
-            else
-            {
-                $moaref_name="";
-
-            }
-
-
-
-            $uid_ref=$indeed_db->get_uid_by_affiliate_id(self::$affiliate_id);
-
-
-
-
-		 if ($this->valid_referral()){
-				require_once UAP_PATH . 'public/Affiliate_Referral_Amount.class.php';
-				$do_math = new Affiliate_Referral_Amount(self::$affiliate_id, '');
-				$amount = $do_math->get_signup_amount();
-                $amount=get_post_meta($order_id,'_order_total',true);
-                $darsad= (int) get_option("refco_primary_setting",1);
-                $comis=($amount*$darsad)/100;
-
-
-
-
-
-
-                $args2 = array(
-							'refferal_wp_uid' => self::$user_id,
-							'campaign' => self::$campaign,
-							'affiliate_id' => self::$affiliate_id,
-							'visit_id' => self::$visit_id,
-							'description' => '',
-							'source' => 'woo',
-							'reference' => $order_id,
-							'reference_details' => '',
-							'amount' => $comis,
-							'currency' => self::$currency,
-							'product_price' => $amount,
-		       	);
-
-
-
-
-
-
-				$this->save_referral_unverified($args2);
-
-              if (class_exists('WooWallet'))
-              {
-                   $tr_type=get_user_meta($uid_ref,'uap_affiliate_payment_type',true);
-                   if ($tr_type=='wallet')
-                    woo_wallet()->wallet->credit($uid_ref,$comis,"Ref App");
-              }
-
-
-              //  update_user_meta(self::$user_id, 'moaref_name',self::$affiliate_id);
-				$default_sts = get_option('uap_sign_up_default_referral_status');
-			    if ($default_sts==2){
-
-					$this->referral_verified('user_id_' . $user_id, '', FALSE);
-			   }
-		 	}
-		}
-
-
-
-
-          	/*
-		 * @param int (order id)
-		 * @return none
-		 */
-
-       // if ($_POST['moaref_name'] )
-            // wc_add_notice( __( 'Phone 2 is compulsory. Please enter a value' ), 'error' );
-
-     /*
-
-		if (empty($order_id)){
-			return; // out
-		}
-		$order = new WC_Order($order_id);
-		self::$user_id = (int)$order->user_id;
-
-		if (empty(self::$affiliate_id)){
-			/// let's check the coupon...
-			$this->check_coupon($order);
-		}
-
-       if ($_POST['moaref_name'] )
-
-        {
-                $moaref_name= $_POST['moaref_name'];
-                $user = get_user_by( 'user_login',$moaref_name);
-                $refi=$user->ID;
-                self::$user_id=$refi;
-                self::$affiliate_id=$indeed_db->affiliate_get_id_by_uid($refi);
-
-        }
-        else
-         {
-
-        $this->set_affiliate_id();
-
-		///CHECKOUT REFERRAL SELECT
-	  //	$this->check_for_selected_affiliate();
-		///CHECKOUT REFERRAL SELECT
-         }
-		///CHECKOUT REFERRAL SELECT
-
-		if ($this->valid_referral()){
-			// it's valid
-
-			/// tax & shipping settings
-			global $indeed_db;
-			$temp_data = $indeed_db->return_settings_from_wp_option('general-settings');
-			$exclude_shipping = (empty($temp_data['uap_exclude_shipping'])) ? FALSE : TRUE;
-			$exclude_tax = (empty($temp_data['uap_exclude_tax'])) ? FALSE : TRUE;
-
-			/// calculate the amount object
-			require_once UAP_PATH . 'public/Affiliate_Referral_Amount.class.php';
-			$do_math = new Affiliate_Referral_Amount(self::$affiliate_id, $this->source_type, self::$special_payment_type, self::$coupon_code);
-
-			if (!empty(self::$coupon_code)){
-				$temp_coupon_data = $indeed_db->get_coupon_data(self::$coupon_code);
-				if ($temp_coupon_data['amount_type']=='flat'){
-					$run_foreach_line_once = TRUE;
-				}
-			}
-
-			$items = $order->get_items();
-			$shipping = $order->get_total_shipping();
-			if ($shipping){
-				@$shipping_per_item = $shipping / count($items);
-			} else {
-				$shipping_per_item = 0;
-			}
-			$sum = 0;
-			$product_price_sum = 0;
-			foreach ($items as $item){ /// foreach in lines
-				$products_arr[] = $item['product_id'];
-
-				///base price
-				$product_price = round($item['line_total'], 3);
-
-				///add shipping if it's case
-				if (!empty($shipping_per_item) && !$exclude_shipping){
-					$product_price += round($shipping_per_item, 3);
-				}
-
-				/// add taxes if it's case
-				if (!empty($item['line_tax']) && !$exclude_tax){
-					$product_price += round($item['line_tax'], 3);
-				}
-
-				$product_price_sum += $product_price;
-
-				/// get amount
-				$temp_amount = $do_math->get_result($product_price, $item['product_id']);// input price, product id
-				$sum += $temp_amount;
-
-				if (!empty($run_foreach_line_once)){
-					/// user for coupon flat amount!
-					break;
-				}
-			}
-			if (!empty($products_arr)){
-				$product_list = implode(',', $products_arr);
-			} else {
-				$product_list = '';
-			}
-
-			$args = array(
-							'refferal_wp_uid' => self::$user_id,
-							'campaign' => self::$campaign,
-							'affiliate_id' => self::$affiliate_id,
-							'visit_id' => self::$visit_id,
-							'description' => '',
-							'source' => $this->source_type,
-							'reference' => $order_id,
-							'reference_details' => $product_list,
-							'amount' => $sum,
-							'currency' => self::$currency,
-							'product_price' => $product_price_sum,
-			);
-			$this->save_referral_unverified($args);
-		}
-
-
-
-*/
-
-
-
-
-
-
-
-		}
-
-
-
-
-
 	public function insert_signup_referral($user_id=0){
 		/*
 		 * @param int
 		 * @return none
 		 */
-
-         	global $indeed_db;
-            
 		if (get_option('uap_sign_up_referrals_enable') && $user_id){
 			self::$user_id = $user_id;
 			$this->set_affiliate_id();
-            $moaref_name="";
-            if ( isset( $_POST['moaref_name'] ) )
-            {
-                $moaref_name= $_POST['moaref_name'];
-                $user = get_user_by( 'user_login',$moaref_name);
-                $refi=$user->ID;
-                self::$affiliate_id=$indeed_db->affiliate_get_id_by_uid($refi);
-            }
-
-            else
-            {
-                $moaref_name="";
-
-            }
-
-
-           $uid_ref=(int) $indeed_db->get_uid_by_affiliate_id(self::$affiliate_id);
-           //$user = get_user_by( 'ID',$uid_ref);
-          // $user_login=$user->user_login;
-
-
-
-
-           $user_info = get_userdata($uid_ref);
-           $user_login=$user_info->user_login;
-
-		 if ($this->valid_referral()){
+			if ($this->valid_referral()){
 				require_once UAP_PATH . 'public/Affiliate_Referral_Amount.class.php';
 				$do_math = new Affiliate_Referral_Amount(self::$affiliate_id, '');
 				$amount = $do_math->get_signup_amount();
@@ -545,22 +283,17 @@ class Referral_Main{
 						'description' => 'User SignUp',
 						'source' => 'User SignUp',
 						'reference' => 'user_id_' . $user_id,
-						'reference_details' => 'ref='.$moaref_name,
+						'reference_details' => 'User SignUp',
 						'amount' => $amount,
 						'currency' => self::$currency,
 				);
 				$this->save_referral_unverified($args);
-
-
-
-                update_user_meta(self::$user_id, 'moaref_name',$user_login);
-                update_user_meta(self::$user_id, 'is_moaref_name',$user_login);
-                $default_sts = get_option('uap_sign_up_default_referral_status');
-			    if ($default_sts==2){
+				$default_sts = get_option('uap_sign_up_default_referral_status');
+				if ($default_sts==2){
 					/// MAKE VERIFIED
 					$this->referral_verified('user_id_' . $user_id, '', FALSE);
-			   }
-		 	}
+				}
+			}
 		}
 	}
 

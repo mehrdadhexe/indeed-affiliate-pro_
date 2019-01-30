@@ -14,7 +14,7 @@
 				<label for="tag-name" class="iump-labels" style="text-align: left;"><?php _e('Purchase Code', 'uap');?></label>
 			</div>	
 			<div class="iump-form-line iump-no-border" style="width:70%; float:left; box-sizing:border-box;">	
-				<input name="uap_licensing_code" type="text" value="<?php echo $data['uap_envato_code'];?>" style="width:100%;" placeholder="please enter 'CodeXinh.com' here"/>
+				<input name="uap_licensing_code" type="text" value="<?php echo $data['uap_envato_code'];?>" style="width:100%;"/>
 			</div>
 			<div class="uap-stuffbox-submit-wrap iump-submit-form" style="width:20%; float:right; box-sizing:border-box; text-align:center;">
 				<input type="submit" value="<?php _e('Activate', 'uap');?>" name="uap_save_licensing_code" <?php echo $disabled;?> class="button button-primary button-large" />
@@ -68,7 +68,7 @@
 		    </label>
 		</h3>
 		<div class="inside">
-			<iframe src="http://affiliate.wpindeed.com/documentation/" width="100%" height="1000px" ></iframe>
+			<iframe src="https://affiliate.wpindeed.com/documentation/" width="100%" height="1000px" ></iframe>
 		</div>
 	</div>	
 

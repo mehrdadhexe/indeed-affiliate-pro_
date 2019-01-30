@@ -14,7 +14,7 @@ var UapAccountPageBanner = {
               modal                     : true,
               fileNameInput             : 'uap_upload_image_top_banner',
               imgEyecandyOpacity        : 0.4,
-              loaderHtml                : '<div class="loader bubblingG"><span id="bubblingG_1"></span><span id="bubblingG_2"></span><span id="bubblingG_3"></span></div>',
+              loaderHtml                : '<div class="loader cssload-wrapper"><div id="floatingCirclesG"><div class="f_circleG" id="frotateG_01"></div><div class="f_circleG" id="frotateG_02"></div><div class="f_circleG" id="frotateG_03"></div><div class="f_circleG" id="frotateG_04"></div><div class="f_circleG" id="frotateG_05"></div><div class="f_circleG" id="frotateG_06"></div><div class="f_circleG" id="frotateG_07"></div><div class="f_circleG" id="frotateG_08"></div></div>',
               onBeforeImgUpload         : function(){},
               onAfterImgUpload          : function(){},
               onImgDrag                 : function(){},

@@ -367,6 +367,27 @@ jQuery(document).ready(function() {
 
 			case 'upload_image':
 				global $indeed_db;
+				$data = $attr;
+				$data['rand'] = rand(1, 10000);
+				$data['imageClass'] = 'uap-member-photo';
+				if (empty($data['user_id'])){
+						$data['user_id'] = -1;
+				}
+				$data['imageUrl'] = '';
+				if ( !empty($data['value']) ){
+						if (strpos($data['value'], "http")===0){
+								$data['imageUrl'] = $data['value'];
+						} else {
+								$tempData = $indeed_db->getMediaBaseImage($data['value']);
+								if (!empty($tempData)){
+									$data['imageUrl'] = $tempData;
+								}
+						}
+				}
+				$viewObject = new \Indeed\Uap\IndeedView();
+				$str = $viewObject->setTemplate( UAP_PATH . 'public/views/upload_image.php')->setContentData( $data )->getOutput();
+				/*
+				global $indeed_db;
 				$upload_settings = $indeed_db->return_settings_from_wp_option('general-uploads');
 				$max_size = $upload_settings['uap_avatar_max_size'] * 1000000;
 				$rand = rand(1,10000);
@@ -443,6 +464,7 @@ jQuery(document).ready(function() {
 				if (!empty($attr['sublabel'])){
 					$str .= '<label class="uap-form-sublabel">' . uap_correct_text($attr['sublabel']) . '</label>';
 				}
+				*/
 				break;
 
 			case 'plain_text':
@@ -533,15 +555,31 @@ function uap_send_user_notifications($u_id=0, $notification_type='', $rank=0, $d
 		if (empty($rank)){
 			$rank = $indeed_db->get_affiliate_rank(0, $u_id);
 		}
+		$domain = 'uap';
+		$languageCode = get_user_meta( $u_id, 'uap_locale_code', true );
 		if ($rank && $rank>-1){
 			$data = $indeed_db->get_notification_for_rank($rank, $notification_type);
+			if ($data){
+					$subject = (empty($data['subject'])) ? '' : $data['subject'];
+					$message = (empty($data['message'])) ? '' : $data['message'];
+					$wmplName = $notification_type . '_subject_' . $rank;
+					$subject = apply_filters( 'wpml_translate_single_string', $subject, $domain, $wmplName, $languageCode );
+					$wmplName = $notification_type . '_message_' . $rank;
+					$message = apply_filters( 'wpml_translate_single_string', $message, $domain, $wmplName, $languageCode );
+			}
 		}
 		if (empty($data) || $rank==-1 || !$rank){
 			$data = $indeed_db->get_notification_for_rank(-1, $notification_type);
+			if ($data){
+					$subject = (empty($data['subject'])) ? '' : $data['subject'];
+					$message = (empty($data['message'])) ? '' : $data['message'];
+					$wmplName = $notification_type . '_subject_-1';
+					$subject = apply_filters( 'wpml_translate_single_string', $subject, $domain, $wmplName, $languageCode );
+					$wmplName = $notification_type . '_message_-1';
+					$message = apply_filters( 'wpml_translate_single_string', $message, $domain, $wmplName, $languageCode );
+			}
 		}
 		if (!empty($data)){
-			$subject = (empty($data['subject'])) ? '' : $data['subject'];
-			$message = (empty($data['message'])) ? '' : $data['message'];
 			$from_name = get_option('uap_notification_name');
 			if (empty($from_name)){
 				$from_name = get_option("blogname");
@@ -1402,6 +1440,7 @@ function uap_get_avatar_for_uid($uid){
 	 * @param int
 	 * @return string
 	 */
+	global $indeed_db;
 	$avatar_url = UAP_URL . 'assets/images/no-avatar.png';
 	if (!empty($uid)){
 		$avatar = get_user_meta($uid, 'uap_avatar', TRUE);
@@ -1409,6 +1448,10 @@ function uap_get_avatar_for_uid($uid){
 			if (strpos($avatar, "http")===0){
 				$avatar_url = $avatar;
 			} else {
+				$avatar_url = $indeed_db->getMediaBaseImage( $avatar );
+				if ( $avatar_url && strpos($avatar_url, "http")===0 ){
+						return $avatar_url;
+				}
 				$avatar_data = wp_get_attachment_image_src($avatar, 'full');
 				if (!empty($avatar_data[0])){
 					$avatar_url = $avatar_data[0];
@@ -2032,5 +2075,20 @@ function dd($variable)
 {
 		indeed_debug_var($variable);
 		die;
+}
+endif;
+
+if ( !function_exists('indeed_get_current_language_code') ):
+function indeed_get_current_language_code()
+{
+		$languageCode = get_locale();
+		if ( !$languageCode ){
+				return false;
+		}
+		$language = explode( '_', $languageCode );
+		if ( isset($language[0]) ){
+				return $language[0];
+		}
+		return $languageCode;
 }
 endif;

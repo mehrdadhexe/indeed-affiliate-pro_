@@ -113,13 +113,24 @@ class RestAPI extends \WP_REST_Controller
                 'args'                  => $this->get_collection_params(),
         ]);
 
-
     }
 
-    public function permissions($request) {
-    		if ( ! empty( $request['roles'] ) && ! current_user_can( 'administrator' ) ) {
+
+
+    public function permissions($request)
+    {
+        $username = isset($_SERVER['PHP_AUTH_USER']) ? esc_sql($_SERVER['PHP_AUTH_USER']) : '';
+        $password = isset($_SERVER['PHP_AUTH_PW']) ? esc_sql($_SERVER['PHP_AUTH_PW']) : '';
+        if ( !$username || !$password ){
             return false;
-    		}
+        }
+        $user = wp_authenticate( $username, $password );
+        if ( is_wp_error( $user ) ) {
+            return false;
+        }
+        if ( empty($user->roles) || !in_array('administrator', $user->roles) ){
+            return false;
+        }
     		return true;
     }
 

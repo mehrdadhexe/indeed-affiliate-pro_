@@ -49,7 +49,7 @@
 			<?php echo $data['submit_button'];?>
 		</div>
 
-        <?php if ($data['template']=='uap-register-14'):?>
+        <?php if ($data['template']=='uap-register-14' && is_user_logged_in() == false):?>
         	</div>
             <div class="uap-register-row-right">
             <?php

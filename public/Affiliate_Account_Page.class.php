@@ -37,6 +37,8 @@ if (!class_exists('Affiliate_Account_Page')){
 			 * @param none
 			 * @return string
 			 */
+			ob_start();
+
 			$tab = (empty($_GET['uap_aff_subtab'])) ? 'overview' : $_GET['uap_aff_subtab'];
 
 			/// HEAD
@@ -125,6 +127,10 @@ if (!class_exists('Affiliate_Account_Page')){
 
 			/// FOOTER
 			$this->footer();
+
+			$output = ob_get_contents();
+			ob_end_clean();
+			return $output;
 		}
 
 		private function create_link_for_aff($link='', $slug=''){
@@ -204,13 +210,7 @@ if (!class_exists('Affiliate_Account_Page')){
 			$data['message'] = uap_replace_constants($this->account_page_settings['uap_ap_welcome_msg'], $this->uid);
 			$data['message'] = stripslashes(uap_format_str_like_wp($data['message']));
 			if ($this->account_page_settings['uap_ap_edit_show_avatar']){
-				$avatar = get_user_meta($this->uid, 'uap_avatar', true);
-				if (strpos($avatar, "http")===0){
-					$avatar_url = $avatar;
-				} else {
-					$avatar_url = wp_get_attachment_url($avatar);
-				}
-				$data['avatar'] = ($avatar_url) ? $avatar_url : UAP_URL . 'assets/images/no-avatar.png';
+				$data['avatar'] = uap_get_avatar_for_uid($this->uid);
 			}
 			if ($this->account_page_settings['uap_ap_edit_show_rank']) $data['top-rank'] = 1;
 			if ($this->account_page_settings['uap_ap_edit_show_earnings']) $data['top-earning'] = 1;
@@ -261,7 +261,7 @@ if (!class_exists('Affiliate_Account_Page')){
 			$payment_settings = $indeed_db->get_affiliate_payment_type($this->uid);
 
 			if (empty($payment_settings['is_active']) && empty($this->public_extra_settings['uap_hide_payments_warnings'])){
-			   //	$data['warning_messages'][] = __('Payment Service Settings are not set properly', 'uap');
+				$data['warning_messages'][] = __('Payment Service Settings are not set properly', 'uap');
 			}
 
 			$fullPath = UAP_PATH . 'public/views/account_page-top_messages.php';

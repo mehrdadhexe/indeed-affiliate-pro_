@@ -21,7 +21,7 @@
 						<?php if (!empty($data['rank_list'])) :?>
 							
 							<h3><?php _e('LifeTime Amount For Each Rank', 'uap');?></h3>
-							<p><?php _e('Set a special lifetime amount for each rank that will replace the default amount rank. This option will also become available in the “Rank Settings” page.', 'uap');?></p>
+							<p><?php _e('Set a special lifetime amount for each rank that will replace the default amount rank. This option will also become available in the "Rank Settings" page.', 'uap');?></p>
 							<table class="uap-dashboard-inside-table">
 								<tr>
 									<th><?php _e('Rank Name', 'uap');?></th>

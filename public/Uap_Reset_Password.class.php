@@ -1,18 +1,19 @@
-<?php 
-if (!class_exists('Uap_Reset_Password')) : 
+<?php
+if (!class_exists('Uap_Reset_Password')) :
 
 class Uap_Reset_Password{
 	private static $reset_success = 0;
 	public function __construct(){}
-	
+
 	public function form(){
 		/*
 		 * @param none
 		 * @return string
 		 */
+		$output = '';
 		if (!is_user_logged_in()){
 			global $indeed_db;
-			$meta_arr = $indeed_db->return_settings_from_wp_option('login');				
+			$meta_arr = $indeed_db->return_settings_from_wp_option('login');
 			if (!empty(self::$reset_success)){
 				if (self::$reset_success==2){
 					$data['success_message'] = get_option('uap_reset_msg_pass_ok');
@@ -20,10 +21,14 @@ class Uap_Reset_Password{
 					$data['error_message'] = get_option('uap_reset_msg_pass_err');
 				}
 			}
+			ob_start();
 			require_once UAP_PATH . 'public/views/reset_password.php';
+			$output = ob_get_contents();
+			ob_end_clean();
 		}
+		return $output;
 	}
-	
+
 	public function do_reset(){
 		/*
 		 * @param none
@@ -36,7 +41,7 @@ class Uap_Reset_Password{
 			self::$reset_success = 2;
 		}
 	}
-	
+
 }
 
 endif;

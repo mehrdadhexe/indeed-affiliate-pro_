@@ -6,7 +6,7 @@
 			<div class="row">
 				<div class="col-xs-7">
 					<h3><?php _e('Activate/Hold Periodical Reports', 'uap');?></h3>
-					<p><?php _e('If this module is activated, affiliates will receive periodical reports about their affiliate account and rewards. Each affiliate may decide the frequency of these reports (daily, weekly, monthly) from his “Account Page”.', 'uap');?></p>
+					<p><?php _e('If this module is activated, affiliates will receive periodical reports about their affiliate account and rewards. Each affiliate may decide the frequency of these reports (daily, weekly, monthly) from his "Account Page".', 'uap');?></p>
 					<label class="woo_account_page_enable" style="margin:10px 0 10px -10px;">
 					<?php $checked = ($data['metas']['uap_periodically_reports_enable']) ? 'checked' : '';?>
 					<input type="checkbox" class="uap-switch" onClick="uap_check_and_h(this, '#uap_periodically_reports_enable');" <?php echo $checked;?> />
@@ -69,7 +69,7 @@
 			<div class="row">
 				<div class="col-xs-8">
 					<h3><?php _e('Send Notification Time', 'uap');?></h3>
-					<p><?php _e('Decide when it\’s the best time of day for your website to start managing email reports. The script runs daily on the back-end and checks the report period for each affiliate and how much time has passed since the last report. Based on this new reports are managed automatically by the system.', 'uap');?></p>
+					<p><?php _e('Decide when it is the best time of day for your website to start managing email reports. The script runs daily on the back-end and checks the report period for each affiliate and how much time has passed since the last report. Based on this new reports are managed automatically by the system.', 'uap');?></p>
 					<select name="uap_periodically_reports_cron_hour" style="min-width:100px; margin-bottom:10px;"><?php 
 						for ($i=0; $i<24; $i++){
 							$selected = ($data['metas']['uap_periodically_reports_cron_hour']==$i) ? 'selected' : '';

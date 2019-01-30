@@ -2,10 +2,10 @@
 if (!class_exists('UapMailServices')){
 	class UapMailServices{
 		public $dir_path = '';
-	
+
 		public function indeed_getResponse($api_key, $token, $e_mail, $full_name=''){
 			if (!class_exists('jsonRPCClient')){
-				require_once $this->dir_path . '/email_services/getresponse/jsonRPCClient.php';				
+				require_once $this->dir_path . '/email_services/getresponse/jsonRPCClient.php';
 			}
 			$api = new jsonRPCClient('http://api2.getresponse.com');
 			$args = array(
@@ -17,15 +17,14 @@ if (!class_exists('UapMailServices')){
 			if($res) return 1;
 			else return 0;
 		}
-	
+
 		public function indeed_mailChimp($mailchimp_api, $mailchimp_id_list, $e_mail, $first_name='', $last_name=''){
 			if ($mailchimp_api !='' && $mailchimp_id_list !=''){
 				if (!class_exists('MailChimp')){
 					require_once $this->dir_path . '/email_services/mailchimp/MailChimp.php';
-				}				
-	
+				}
 				$MailChimp = new MailChimp($mailchimp_api);
-	
+
 				$result = $MailChimp->call('lists/subscribe', array(
 						'id'                => $mailchimp_id_list,
 						'email'             => array('email'=>$e_mail),
@@ -35,7 +34,7 @@ if (!class_exists('UapMailServices')){
 						'send_welcome'      => 0,
 						'merge_vars'        => array('FNAME'=>$first_name, 'LNAME'=>$last_name),
 				));
-	
+
 				if(!empty($result['email']) && !empty($result['euid']) && !empty($result['leid'])) {
 					return 1;
 				} else {
@@ -43,11 +42,11 @@ if (!class_exists('UapMailServices')){
 				}
 			}
 		}
-	
+
 		public function indeed_campaignMonitor($listId, $apiID, $e_mail, $full_name=''){
 			if (!class_exists('CS_REST_Subscribers')){
 				require_once $this->dir_path .'/email_services/campaignmonitor/csrest_subscribers.php';
-			}			
+			}
 			$obj = new CS_REST_Subscribers($listId, $apiID);
 			$args = array(
 					'EmailAddress' => $e_mail,
@@ -58,11 +57,11 @@ if (!class_exists('UapMailServices')){
 			if ($result->was_successful()) return 1;
 			else return 0;
 		}
-	
+
 		public function indeed_iContact( $apiUser, $appId, $apiPass, $listId ,$e_mail, $first_name='', $last_name=''){
 			if (!class_exists('iContactApi')){
 				require_once $this->dir_path .'/email_services/icontact/iContactApi.php';
-			}			
+			}
 			iContactApi::getInstance()->setConfig(array(
 					'appId' => $appId,
 					'apiPassword' => $apiPass,
@@ -75,11 +74,11 @@ if (!class_exists('UapMailServices')){
 				else return 0;
 			}else return 0;
 		}
-	
+
 		public function indeed_constantContact($apiUser, $apiPass, $listId, $e_mail, $first_name='', $last_name=''){
 			if (!class_exists('cc')){
 				require_once $this->dir_path .'/email_services/constantcontact/class.cc.php';
-			}			
+			}
 			$extra_fields['FirstName'] = $first_name;
 			$extra_fields['LastName'] = $last_name;
 			$cc = new cc($apiUser, $apiPass);
@@ -94,9 +93,9 @@ if (!class_exists('UapMailServices')){
 				if($new_id) return 1;
 				else return 0;
 			}
-				
+
 		}
-	
+
 		public function indeed_wysija_subscribe( $listId, $e_mail, $first_name='', $last_name='' ){
 			if(class_exists('WYSIJA')){
 				$user_data = array(
@@ -113,7 +112,7 @@ if (!class_exists('UapMailServices')){
 			}
 			return 0;
 		}
-	
+
 		public function indeed_returnWysijaList(){
 			//returning list from mail poet
 			$list = array();
@@ -129,7 +128,7 @@ if (!class_exists('UapMailServices')){
 			if(!isset($list_arr) || count($list_arr) == 0) return FALSE;
 			else return $list_arr;
 		}
-	
+
 		public function indeed_myMailSubscribe( $listId, $e_mail ){
 	      	$userdata = array(
 					'firstname' => '',
@@ -140,17 +139,17 @@ if (!class_exists('UapMailServices')){
 				$return = mailster_subscribe($e_mail, $userdata, array($listId), 0);
 				if (!is_wp_error($return)){
 					return 1;
-				}				
+				}
 			} else if (function_exists('mymail_subscribe')){
 				/// MYMAIL (old version)
 				$return = mymail_subscribe($e_mail, $userdata, array($listId), 0);
 				if (!is_wp_error($return)){
 					return 1;
-				} 
+				}
 	        }
 	        return 0;
 		}
-	
+
 		public function indeed_getMyMailLists(){
 		    if (function_exists('mailster')){
 		    	/// mailster
@@ -161,7 +160,7 @@ if (!class_exists('UapMailServices')){
 	    			}
 	    			return $list_arr;
 	    		}
-	    		return FALSE;		    	
+	    		return FALSE;
 		    } else if (function_exists('mymail') ){
 	    		// MyMail >=v2
 	    		$lists = mymail('lists')->get();
@@ -197,11 +196,11 @@ if (!class_exists('UapMailServices')){
 		        }else return 0;
 	    	}
 		}
-	
+
 		public function indeed_aWebberSubscribe( $consumer_key, $consumer_secret, $access_key, $access_secret, $aw_list, $e_mail, $full_name='' ){
 			if (!class_exists('AWeberAPI')){
 				require_once $this->dir_path .'/email_services/aweber/aweber_api.php';
-			}			
+			}
 			try {
 				$aweber = new AWeberAPI($consumer_key, $consumer_secret);
 				$account = $aweber->getAccount($access_key, $access_secret);
@@ -217,10 +216,10 @@ if (!class_exists('UapMailServices')){
 				return 0;
 			}
 		}
-	
+
 		public function indeed_madMimi($username, $api_key, $listName, $e_mail, $first_name='', $last_name=''){
 			if (!class_exists('MadMimi')){
-				require_once $this->dir_path .'/email_services/madmimi/MadMimi.class.php';				
+				require_once $this->dir_path .'/email_services/madmimi/MadMimi.class.php';
 			}
 			$mailer = new MadMimi( $username, $api_key );
 			$user = array( 'email' => $e_mail,
@@ -254,7 +253,7 @@ if (!class_exists('UapMailServices')){
 			}
 			$contact_sync = $ac->api("contact/sync", $contact);
 		}
-		
-	
-	}	
+
+
+	}
 }
